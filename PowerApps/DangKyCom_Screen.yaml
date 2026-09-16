@@ -1,0 +1,500 @@
+Screens:
+  DangKyCom_DangKyMoi:
+    Properties:
+      Fill: =RGBA(245, 246, 250, 1)
+      LoadingSpinner: =LoadingSpinner.Data
+      LoadingSpinnerColor: =RGBA(255, 200, 61, 1)
+      OnVisible: |-
+        =UpdateContext({
+            locSoLuong: 1,
+            locLoaiMon: "Cơm mặn",
+            locGhiChu: "",
+            varShowSuccessPopup: false,
+            locNgayAn: Today()
+        })
+    Children:
+      # =========================================================================
+      # 1. THANH TIÊU ĐỀ QUICK ACTION BAR (Header chuẩn SEAZEN HR)
+      # =========================================================================
+      - RectHeader_Canteen:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(9, 33, 98, 1)
+            Height: =85
+            Width: =Parent.Width
+
+      - IconBack_Canteen:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =24
+            HoverColor: =RGBA(255, 200, 61, 1)
+            Icon: =Icon.ChevronLeft
+            OnSelect: =Back()
+            Width: =24
+            X: =15
+            Y: =30
+
+      - LblTitle_Canteen:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =30
+            PaddingLeft: =10
+            Size: =18
+            Text: ="ĐĂNG KÝ CƠM TRƯA (CANTEEN)"
+            Width: =420
+            X: =45
+            Y: =16
+
+      - LblSubTitle_Canteen:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 200, 61, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            PaddingLeft: =10
+            Size: =11
+            Text: |-
+              ="HẠN CHỐT: TRƯỚC 09:30 SÁNG HÀNG NGÀY"
+            Width: =420
+            X: =45
+            Y: =46
+
+      # =========================================================================
+      # 2. KHỐI THÔNG TIN NHÂN VIÊN (Lấy từ _userRecord chuẩn SEAZEN HR)
+      # =========================================================================
+      - RectUserInfo_Canteen:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(220, 224, 233, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =90
+            Width: =Parent.Width - 30
+            X: =15
+            Y: =100
+
+      - ImgAvatar_Canteen:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(255, 200, 61, 1)
+            BorderThickness: =2
+            Fill: =RGBA(240, 240, 240, 1)
+            Height: =60
+            Image: =Coalesce(_userRecord.'Hinh ảnh NV'.Full, SampleImage)
+            ImagePosition: =ImagePosition.Fill
+            RadiusBottomLeft: =30
+            RadiusBottomRight: =30
+            RadiusTopLeft: =30
+            RadiusTopRight: =30
+            Width: =60
+            X: =30
+            Y: =115
+
+      - LblUserName_Canteen:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =26
+            Size: =15
+            Text: =Coalesce(_userRecord.'HỌ VÀ TÊN'.Value, User().FullName)
+            Width: =350
+            X: =105
+            Y: =115
+
+      - LblUserMeta_Canteen:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(120, 120, 120, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =12
+            Text: |-
+              ="MSNV: " & Coalesce(_userRecord.MSNV.Value, "14703") & "  •  " & Coalesce(_userRecord.'Chức Vụ'.Value, "Nhân viên")
+            Width: =350
+            X: =105
+            Y: =142
+
+      # =========================================================================
+      # 3. FORM ĐẶT CƠM CHÍNH (Card nền trắng)
+      # =========================================================================
+      - RectFormCard_Canteen:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(220, 224, 233, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =430
+            Width: =Parent.Width - 30
+            X: =15
+            Y: =205
+
+      # --- 3.1 CHỌN NGÀY ĂN ---
+      - LblLblNgayAn:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =24
+            Size: =13
+            Text: ="1. NGÀY ĂN TRƯA (*)"
+            Width: =300
+            X: =35
+            Y: =225
+
+      - DatePicker_NgayAn:
+          Control: Classic/DatePicker@2.6.0
+          Properties:
+            BorderColor: =RGBA(200, 205, 215, 1)
+            BorderThickness: =1
+            Color: =RGBA(9, 33, 98, 1)
+            DefaultDate: =Today()
+            Height: =42
+            SelectableStartDate: =Today()
+            SelectableEndDate: =DateAdd(Today(), 3, TimeUnit.Days)
+            StartOfWeek: =StartOfWeek.Monday
+            Width: =Parent.Width - 70
+            X: =35
+            Y: =252
+
+      # --- 3.2 CHỌN LOẠI SUẤT ĂN ---
+      - LblLblLoaiMon:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =24
+            Size: =13
+            Text: ="2. CHỌN KHẨU VỊ (*)"
+            Width: =300
+            X: =35
+            Y: =305
+
+      - Radio_LoaiMon:
+          Control: Classic/Radio@2.3.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(9, 33, 98, 1)
+            Default: ="Cơm mặn"
+            Height: =45
+            Items: =["Cơm mặn", "Cơm chay"]
+            RadioBorderColor: =RGBA(9, 33, 98, 1)
+            Size: =13
+            Width: =Parent.Width - 70
+            X: =35
+            Y: =330
+
+      # --- 3.3 CHỌN SỐ LƯỢNG SUẤT (Bộ tăng giảm +/-) ---
+      - LblLblSoLuong:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =24
+            Size: =13
+            Text: ="3. SỐ LƯỢNG SUẤT ĐẶT (*)"
+            Width: =300
+            X: =35
+            Y: =390
+
+      - BtnMinus_Qty:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =RGBA(9, 33, 98, 1)
+            BorderThickness: =1
+            Color: =RGBA(9, 33, 98, 1)
+            Fill: =RGBA(245, 246, 250, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =42
+            HoverFill: =RGBA(230, 235, 245, 1)
+            OnSelect: |-
+              =UpdateContext({locSoLuong: Max(1, locSoLuong - 1)})
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =20
+            Text: ="-"
+            Width: =50
+            X: =35
+            Y: =418
+
+      - LblDisplayQty:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(200, 205, 215, 1)
+            BorderThickness: =1
+            Color: =RGBA(9, 33, 98, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =42
+            Size: =16
+            Text: =Text(locSoLuong) & " Suất"
+            Width: =130
+            X: =95
+            Y: =418
+
+      - BtnPlus_Qty:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =RGBA(9, 33, 98, 1)
+            BorderThickness: =1
+            Color: =RGBA(9, 33, 98, 1)
+            Fill: =RGBA(245, 246, 250, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =42
+            HoverFill: =RGBA(230, 235, 245, 1)
+            OnSelect: |-
+              =UpdateContext({locSoLuong: Min(5, locSoLuong + 1)})
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =20
+            Text: ="+"
+            Width: =50
+            X: =235
+            Y: =418
+
+      - LblQtyHint:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(130, 130, 130, 1)
+            Font: =Font.'Segoe UI'
+            Height: =42
+            Size: =11
+            Text: ="(Có thể đặt giúp đồng nghiệp, tối đa 5 suất)"
+            Width: =250
+            X: =300
+            Y: =418
+
+      # --- 3.4 GHI CHÚ THÊM ---
+      - LblLblGhiChu:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =24
+            Size: =13
+            Text: ="4. GHI CHÚ CHO BẾP (NẾU CÓ)"
+            Width: =300
+            X: =35
+            Y: =475
+
+      - TxtGhiChu_Canteen:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(200, 205, 215, 1)
+            BorderThickness: =1
+            Color: =RGBA(9, 33, 98, 1)
+            Default: =""
+            Height: =42
+            HintText: |-
+              ="Ví dụ: Ăn ít cơm, nhiều rau..."
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =13
+            Width: =Parent.Width - 70
+            X: =35
+            Y: =502
+
+      # --- 3.5 NÚT XÁC NHẬN ĐẶT CƠM (SUBMIT ĐỘNG THEO DATEPICKER) ---
+      - BtnSubmit_Canteen:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            DisplayMode: |-
+              =With(
+                  {
+                      _diffDays: DateDiff(Today(), DatePicker_NgayAn.SelectedDate, TimeUnit.Days)
+                  },
+                  If(_diffDays < 0 || _diffDays > 3, DisplayMode.Disabled, DisplayMode.Edit)
+              )
+            Fill: |-
+              =With(
+                  {
+                      _diffDays: DateDiff(Today(), DatePicker_NgayAn.SelectedDate, TimeUnit.Days)
+                  },
+                  If(_diffDays < 0 || _diffDays > 3, RGBA(180, 185, 195, 1), RGBA(211, 32, 39, 1))
+              )
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =50
+            HoverFill: =RGBA(166, 20, 26, 1)
+            OnSelect: |-
+              =With(
+                  {
+                      _diffDays: DateDiff(Today(), DatePicker_NgayAn.SelectedDate, TimeUnit.Days)
+                  },
+                  If(
+                      _diffDays < 0,
+                      Notify("Không thể đặt suất ăn cho ngày trong quá khứ!", NotificationType.Error),
+                      
+                      _diffDays > 3,
+                      Notify("Chỉ được đặt trước tối đa 3 ngày!", NotificationType.Error),
+                      
+                      _diffDays = 0 && Time(Hour(Now()), Minute(Now()), 0) > Time(9, 30, 0),
+                      Notify("Đã qua 09:30 sáng! Hệ thống đã khóa đặt cơm cho hôm nay. Vui lòng liên hệ trực tiếp Bếp.", NotificationType.Warning),
+                      
+                      With(
+                          {
+                              _currEmpId: Coalesce(_userRecord.MSNV.Value, "14703"),
+                              _currName: Coalesce(_userRecord.'HỌ VÀ TÊN'.Value, User().FullName),
+                              _currRole: Coalesce(_userRecord.'Chức Vụ'.Value, "TTS")
+                          },
+                          Patch(
+                              Canteen_Orders,
+                              Defaults(Canteen_Orders),
+                              {
+                                  Title: _currEmpId,
+                                  HoTen: _currName,
+                                  ChucVu: _currRole,
+                                  NgayAn: DatePicker_NgayAn.SelectedDate,
+                                  LoaiMon: { Value: Radio_LoaiMon.Selected.Value },
+                                  SoLuongSuat: locSoLuong,
+                                  TrangThai: { Value: "Đã đăng ký" },
+                                  GhiChu: TxtGhiChu_Canteen.Text
+                              }
+                          );
+                          Notify("🎉 Đăng ký thành công " & locSoLuong & " suất (" & Radio_LoaiMon.Selected.Value & ") cho ngày " & Text(DatePicker_NgayAn.SelectedDate, "dd/mm/yyyy") & "!", NotificationType.Success);
+                          Reset(DatePicker_NgayAn);
+                          Reset(Radio_LoaiMon);
+                          Reset(TxtGhiChu_Canteen);
+                          UpdateContext({locSoLuong: 1})
+                      )
+                  )
+              )
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            Size: =15
+            Text: |-
+              =With(
+                  {
+                      _diffDays: DateDiff(Today(), DatePicker_NgayAn.SelectedDate, TimeUnit.Days)
+                  },
+                  Switch(
+                      _diffDays,
+                      0, "🍱 ĐẶT CƠM CHO HÔM NAY",
+                      1, "🍱 ĐẶT CƠM CHO NGÀY MAI (" & Text(DatePicker_NgayAn.SelectedDate, "dd/mm") & ")",
+                      2, "🍱 ĐẶT CƠM CHO NGÀY MỐT (" & Text(DatePicker_NgayAn.SelectedDate, "dd/mm") & ")",
+                      3, "🍱 ĐẶT CƠM CHO NGÀY " & Text(DatePicker_NgayAn.SelectedDate, "dd/mm"),
+                      If(_diffDays < 0, "❌ KHÔNG THỂ ĐẶT CHO QUÁ KHỨ", "❌ CHỈ ĐƯỢC ĐẶT TRƯỚC TỐI ĐA 3 NGÀY")
+                  )
+              )
+            Width: =Parent.Width - 70
+            X: =35
+            Y: =565
+
+      # =========================================================================
+      # 4. DANH SÁCH SUẤT ĂN ĐÃ ĐẶT CỦA TÔI (Lịch sử gần đây)
+      # =========================================================================
+      - LblHistoryTitle_Canteen:
+          Control: Label@2.5.1
+          Properties:
+            Color: =RGBA(9, 33, 98, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =26
+            Size: =14
+            Text: ="LỊCH SỬ SUẤT ĂN CỦA TÔI"
+            Width: =300
+            X: =20
+            Y: =655
+
+      - GalleryMyOrders_Canteen:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            Height: =Parent.Height - 695
+            Items: |-
+              =Sort(
+                  Filter(
+                      Canteen_Orders,
+                      Title = Coalesce(_userRecord.MSNV.Value, "14703")
+                  ),
+                  NgayAn,
+                  SortOrder.Descending
+              )
+            TemplatePadding: =8
+            TemplateSize: =75
+            Width: =Parent.Width - 30
+            X: =15
+            Y: =685
+          Children:
+            - RectItemBg:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(220, 224, 233, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =70
+                  Width: =Parent.TemplateWidth
+                  X: =0
+                  Y: =0
+
+            - LblMealDate:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =RGBA(9, 33, 98, 1)
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =24
+                  Size: =13
+                  Text: =Text(ThisItem.NgayAn, "dd/mm/yyyy") & " - " & ThisItem.LoaiMon.Value
+                  Width: =280
+                  X: =15
+                  Y: =12
+
+            - LblMealDetail:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =RGBA(120, 120, 120, 1)
+                  Font: =Font.'Segoe UI'
+                  Height: =20
+                  Size: =11
+                  Text: |-
+                    ="Số lượng: " & Text(ThisItem.SoLuongSuat) & " suất" & If(!IsBlank(ThisItem.GioNhan), "  • Nhận lúc: " & ThisItem.GioNhan, "")
+                  Width: =280
+                  X: =15
+                  Y: =38
+
+            - LblStatusBadge:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  Color: =If(ThisItem.TrangThai.Value = "Đã nhận cơm", RGBA(255, 255, 255, 1), RGBA(9, 33, 98, 1))
+                  Fill: =If(ThisItem.TrangThai.Value = "Đã nhận cơm", RGBA(39, 174, 96, 1), RGBA(255, 200, 61, 1))
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =28
+                  Size: =11
+                  Text: =ThisItem.TrangThai.Value
+                  Width: =120
+                  X: =Parent.TemplateWidth - 135
+                  Y: =21

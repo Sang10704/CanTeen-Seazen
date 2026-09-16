@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEAZEN CANTEEN - KIOSK CHECK-IN</title>
+  
+  <!-- Google Fonts: Paytone One, Bungee & Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&family=Bungee&family=Paytone+One&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --c-red: #D32027;
+      --c-red-dark: #A6141A;
+      --c-cream: #FFFBF4;
+      --c-cream-dark: #F5EEDB;
+      --c-border: #D32027;
+      --c-black: #1A1A1A;
+      --c-gold: #FFB703;
+      --font-display: 'Paytone One', 'Bungee', sans-serif;
+      --font-body: 'Be Vietnam Pro', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* BACKGROUND MÀU KEM MỊN MÀNG SẠCH SẼ - ĐÃ BỎ HẠT CHẤM LI TI */
+    body {
+      background-color: #F4EEDF;
+      color: var(--c-red);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================
+       INTRO SPLASH OVERLAY KHI MỚI VÀO WEB
+    ========================================== */
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--c-red);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--c-cream);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intro-overlay.fade-out {
+      opacity: 0;
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+
+    .intro-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .intro-badge-seazen {
+      background: var(--c-cream);
+      color: var(--c-red);
+      font-family: var(--font-display);
+      font-size: 54px;
+      padding: 12px 36px;
+      border-radius: 16px;
+      transform: rotate(-4deg);
+      box-shadow: 8px 8px 0px rgba(0,0,0,0.25);
+      animation: introPopBadge 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .intro-canteen-title {
+      font-family: var(--font-display);
+      font-size: 72px;
+      letter-spacing: 4px;
+      color: var(--c-cream);
+      text-shadow: 4px 4px 0px var(--c-black);
+      margin-top: 14px;
+      text-transform: uppercase;
+      animation: introRiseText 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+    }
+
+    .intro-subtitle {
+      font-size: 16px;
+      letter-spacing: 4px;
+      font-weight: 800;
+      color: var(--c-gold);
+      text-transform: uppercase;
+      margin-top: 4px;
+      animation: introRiseText 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    .intro-progress-bar {
+      width: 320px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      margin-top: 36px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .intro-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--c-gold);
+      border-radius: 999px;
+      animation: introLoadingFill 4.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes introPopBadge {
+      0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+      80% { transform: scale(1.12) rotate(-2deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-4deg); opacity: 1; }
+    }
+
+    @keyframes introRiseText {
+      0% { transform: translateY(40px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes introLoadingFill {
+      0% { width: 0%; }
+      30% { width: 45%; }
+      70% { width: 85%; }
+      100% { width: 100%; }
+    }
+
+    /* KIOSK CONTAINER */
+    .kiosk-container {
+      max-width: 1400px;
+      margin: 20px auto;
+      width: 96%;
+      background: var(--c-cream);
+      border: 4px solid var(--c-red);
+      box-shadow: 12px 12px 0px var(--c-red);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .header-bar {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      border-bottom: 4px solid var(--c-red);
+      background: var(--c-red);
+      color: var(--c-cream);
+    }
+
+    .brand-box {
+      padding: 18px 24px;
+      border-right: 4px solid var(--c-cream);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-badge {
+      background: var(--c-cream);
+      color: var(--c-red);
+      font-family: var(--font-display);
+      font-size: 26px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      transform: rotate(-3deg);
+      display: inline-block;
+      box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+    }
+
+    .header-title-box {
+      padding: 16px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header-title-box h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .header-title-box p {
+      font-size: 13px;
+      letter-spacing: 2px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .header-status-box {
+      border-left: 4px solid var(--c-cream);
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .clock-time {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+
+    .clock-date {
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .sp-badge {
+      margin-top: 6px;
+      background: #2ECC71;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sp-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* MAIN BENTO GRID */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      min-height: 640px;
+    }
+
+    .scan-hero-panel {
+      border-right: 4px solid var(--c-red);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .marquee-banner {
+      background: var(--c-cream-dark);
+      border-bottom: 4px solid var(--c-red);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .screen-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* STATE: IDLE */
+    .scanner-target-frame {
+      width: 380px;
+      max-width: 90%;
+      height: 280px;
+      border: 4px dashed var(--c-red);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      background: #FFF8EB;
+      position: relative;
+      margin-bottom: 30px;
+      box-shadow: 6px 6px 0px var(--c-red);
+    }
+
+    .scanner-beam-line {
+      position: absolute;
+      top: 20px;
+      left: 10%;
+      width: 80%;
+      height: 4px;
+      background: var(--c-red);
+      box-shadow: 0 0 12px var(--c-red);
+      animation: scanAnimation 2.2s infinite ease-in-out alternate;
+    }
+
+    @keyframes scanAnimation {
+      0% { top: 20px; opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { top: 250px; opacity: 0.3; }
+    }
+
+    .scan-icon-mascot {
+      font-size: 72px;
+      margin-bottom: 12px;
+    }
+
+    .starburst-badge {
+      position: absolute;
+      top: -24px;
+      right: -24px;
+      background: var(--c-red);
+      color: var(--c-cream);
+      font-family: var(--font-display);
+      font-size: 18px;
+      padding: 12px 16px;
+      clip-path: polygon(50% 0%, 65% 28%, 95% 15%, 82% 43%, 100% 60%, 75% 70%, 80% 100%, 52% 82%, 24% 98%, 30% 68%, 0% 55%, 22% 40%, 10% 10%, 40% 25%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(12deg);
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+    }
+
+    .hero-heading {
+      font-family: var(--font-display);
+      font-size: 38px;
+      text-transform: uppercase;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      color: var(--c-red);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--c-black);
+      background: #FFE8A3;
+      padding: 8px 20px;
+      border: 2px solid var(--c-red);
+      display: inline-block;
+      box-shadow: 4px 4px 0px var(--c-red);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* MEAL TICKET CARD */
+    .meal-ticket-card {
+      background: #FFFFFF;
+      border: 4px solid var(--c-red);
+      box-shadow: 8px 8px 0px var(--c-red);
+      padding: 24px;
+      width: 100%;
+      max-width: 560px;
+      text-align: left;
+      position: relative;
+    }
+
+    .ticket-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px dashed var(--c-red);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+
+    .ticket-tag {
+      font-family: var(--font-display);
+      background: var(--c-red);
+      color: #fff;
+      padding: 6px 14px;
+      font-size: 16px;
+      text-transform: uppercase;
+      border-radius: 4px;
+    }
+
+    .ticket-time {
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--c-black);
+    }
+
+    .emp-name-big {
+      font-family: var(--font-display);
+      font-size: 34px;
+      color: var(--c-red);
+      line-height: 1.1;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .emp-meta-row {
+      display: flex;
+      gap: 16px;
+      font-weight: 700;
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
+
+    .quantity-banner {
+      background: #E74C3C;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 26px;
+      padding: 12px;
+      text-align: center;
+      border: 3px solid var(--c-black);
+      box-shadow: 4px 4px 0px var(--c-black);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: pulseBanner 1.2s infinite alternate;
+    }
+    @keyframes pulseBanner {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.02); }
+    }
+
+    .meal-choice-box {
+      background: #FFF3CD;
+      border: 3px solid var(--c-red);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .meal-icon { font-size: 42px; }
+
+    .meal-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--c-red);
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .stamp-approved {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      border: 4px solid #117A37;
+      color: #117A37;
+      font-family: var(--font-display);
+      font-size: 24px;
+      padding: 6px 18px;
+      text-transform: uppercase;
+      transform: rotate(-15deg);
+      opacity: 0.85;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    /* SIDEBAR */
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--c-cream);
+    }
+
+    .side-block {
+      border-bottom: 4px solid var(--c-red);
+      padding: 20px;
+    }
+
+    /* VECTOR ICONS */
+    .svg-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+    .svg-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .side-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      text-transform: uppercase;
+      color: var(--c-red);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stats-counter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-pill {
+      background: #FFF8EB;
+      border: 2px solid var(--c-red);
+      padding: 12px;
+      text-align: center;
+      box-shadow: 4px 4px 0px var(--c-red);
+    }
+
+    .stat-pill.full-width {
+      grid-column: span 2;
+      background: var(--c-red);
+      color: var(--c-cream);
+    }
+    .stat-pill.full-width .stat-num { color: var(--c-cream); }
+    .stat-pill.full-width .stat-lbl { color: var(--c-cream-dark); }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--c-red);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .live-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 460px;
+      overflow-y: auto;
+    }
+
+    .feed-card {
+      background: #fff;
+      border: 2px solid var(--c-red);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 3px 3px 0px var(--c-red);
+      font-size: 13px;
+    }
+
+    .feed-name { font-weight: 900; color: var(--c-black); font-size: 14px; }
+
+    /* NÚT MỞ BẢNG DANH SÁCH BẰNG CHUỘT */
+    .btn-show-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 14px;
+      background: #FFF8EB;
+      color: var(--c-red);
+      border: 3px solid var(--c-red);
+      padding: 10px 12px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px var(--c-red);
+      transition: all 0.15s ease;
+    }
+    .btn-show-list:hover {
+      background: var(--c-red);
+      color: var(--c-cream);
+      box-shadow: 5px 5px 0px var(--c-black);
+      transform: translate(-1px, -1px);
+    }
+    .btn-show-list:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--c-black);
+    }
+
+    .btn-header-list {
+      background: #FFF8EB;
+      color: var(--c-red);
+      border: 2px solid var(--c-red);
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--c-red);
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-header-list:hover {
+      background: var(--c-red);
+      color: #fff;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--c-black);
+    }
+    .btn-header-list:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--c-black);
+    }
+
+    /* MODAL DANH SÁCH CHI TIẾT */
+    .list-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .list-modal-box {
+      background: #FFFBF4;
+      border: 5px solid var(--c-red);
+      box-shadow: 12px 12px 0px var(--c-black);
+      width: 95%;
+      max-width: 1100px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .list-modal-header {
+      background: var(--c-red);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid var(--c-black);
+    }
+    .list-modal-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      letter-spacing: 1px;
+    }
+    .list-modal-close {
+      background: #fff;
+      color: var(--c-red);
+      border: 3px solid var(--c-black);
+      font-family: var(--font-display);
+      font-size: 16px;
+      padding: 4px 14px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px var(--c-black);
+    }
+    .list-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .canteen-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .canteen-table th {
+      background: #F4EEDF;
+      border: 2px solid var(--c-red);
+      padding: 10px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      text-transform: uppercase;
+      color: var(--c-red);
+      text-align: left;
+    }
+    .canteen-table td {
+      border: 1px solid #E0D5C0;
+      padding: 10px;
+      background: #fff;
+      font-weight: 600;
+      color: var(--c-black);
+    }
+    .canteen-table tr:nth-child(even) td {
+      background: #FAF6ED;
+    }
+    .badge-status-claimed {
+      background: #E8F8EE;
+      color: #117A37;
+      border: 1.5px solid #117A37;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 12px;
+      display: inline-block;
+    }
+    .badge-status-waiting {
+      background: #FFF3CD;
+      color: #D35400;
+      border: 1.5px solid #D35400;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 12px;
+      display: inline-block;
+    }
+
+    #scanner-hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      top: -100px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       INTRO SPLASH OVERLAY (SEAZEN CANTEEN)
+  ========================================== -->
+  <div id="intro-overlay" class="intro-overlay" onclick="dismissIntro()">
+    <div class="intro-box">
+      <div class="intro-badge-seazen">SEAZEN</div>
+      <div class="intro-canteen-title">CANTEEN</div>
+      <div class="intro-subtitle">★ SMART WORKPLACE SYSTEM ★</div>
+      <div class="intro-progress-bar">
+        <div class="intro-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <input type="text" id="scanner-hidden-input" autocomplete="off" autofocus />
+
+  <div class="kiosk-container">
+    
+    <header class="header-bar">
+      <div class="brand-box">
+        <span class="brand-logo-badge">SEAZEN</span>
+        <div>
+          <strong style="font-family: var(--font-display); font-size: 18px; letter-spacing: 0.5px;">CANTEEN</strong>
+          <div style="font-size: 10px; font-weight: 700; opacity: 0.85;">SMART WORKPLACE</div>
+        </div>
+      </div>
+
+      <div class="header-title-box">
+        <h1>BẢNG ĐIỂM DANH SUẤT ĂN TRƯA</h1>
+        <p>HỆ THỐNG CHECK-IN TỰ ĐỘNG BẰNG MÃ THẺ NHÂN VIÊN</p>
+      </div>
+
+      <div class="header-status-box">
+        <div class="clock-time" id="clock-display">11:42:05</div>
+        <div class="clock-date" id="date-display">THỨ HAI, 14/09/2026</div>
+        <div style="display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
+          <span class="sp-badge" id="sp-status">SHAREPOINT: ĐÃ KẾT NỐI</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      
+      <section class="scan-hero-panel">
+        <div class="marquee-banner">
+          <span>★ GIỜ PHỤC VỤ: 11:30 - 13:00</span>
+          <span>★ VUI LÒNG ĐEO THẺ TRƯỚC KHI VÀO QUẦY LẤY CƠM</span>
+          <span>★ CHÚC NGON MIỆNG!</span>
+        </div>
+
+        <div class="screen-stage" id="screen-stage">
+          
+          <div id="view-idle" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="scanner-target-frame">
+              <div class="starburst-badge">READY</div>
+              <div class="scanner-beam-line"></div>
+              <div class="scan-icon-mascot" style="width: 80px; height: 80px; margin-bottom: 8px;">
+                <!-- Modern Bento / Meal Cloche SVG -->
+                <svg viewBox="0 0 64 64" fill="none" style="width:100%; height:100%;">
+                  <circle cx="32" cy="14" r="5" fill="#D32027"/>
+                  <path d="M10 40C10 25.64 20.08 14 32 14C43.92 14 54 25.64 54 40H10Z" fill="#D32027"/>
+                  <rect x="6" y="42" width="52" height="6" rx="3" fill="#D32027"/>
+                  <path d="M12 40C14 28 22 18 32 18" stroke="#FFF8EB" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div style="font-family: var(--font-display); font-size: 20px; color: var(--c-red); text-transform: uppercase;">
+                ĐƯA THẺ VÀO MẶT KÍNH
+              </div>
+              <div style="font-size: 12px; font-weight: 700; color: #888; margin-top: 4px;">
+                MÁY QUÉT 2D ĐANG CHỜ TÍN HIỆU...
+              </div>
+            </div>
+
+            <h2 class="hero-heading">SẴN SÀNG NHẬN DIỆN SUẤT ĂN</h2>
+            <div class="hero-sub">LƯỚT MÃ QR TRÊN THẺ NHÂN VIÊN QUA ĐẦU ĐỌC ĐỂ BẮT ĐẦU</div>
+          </div>
+
+          <div id="view-result" style="display: none; width: 100%; max-width: 600px;">
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SIDEBAR: THỐNG KÊ & VỪA NHẬN TỪ SHAREPOINT -->
+      <aside class="sidebar-panel">
+        
+        <div class="side-block">
+          <div class="side-title">
+            <span class="svg-icon" style="width: 22px; height: 22px; color: var(--c-red);">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+              </svg>
+            </span>
+            <span>ĐỐI SOÁT HÔM NAY</span>
+          </div>
+          <div class="stats-counter-grid">
+            <div class="stat-pill full-width">
+              <div class="stat-num" id="stat-total">0</div>
+              <div class="stat-lbl">TỔNG SUẤT ĐĂNG KÝ HÔM NAY</div>
+            </div>
+            <div class="stat-pill" style="border-color: #2ECC71;">
+              <div class="stat-num" style="color: #27AE60;" id="stat-claimed">0</div>
+              <div class="stat-lbl">ĐÃ NHẬN KHAY</div>
+            </div>
+            <div class="stat-pill" style="border-color: #E67E22;">
+              <div class="stat-num" style="color: #D35400;" id="stat-remaining">0</div>
+              <div class="stat-lbl">CHƯA NHẬN</div>
+            </div>
+          </div>
+          <button type="button" class="btn-show-list" onclick="toggleListModal()" title="Xem danh sách chi tiết tất cả suất ăn hôm nay">
+            <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+            </svg>
+            <span>📋 XEM DANH SÁCH CHI TIẾT</span>
+          </button>
+        </div>
+
+        <!-- DANH SÁCH VỪA NHẬN THẬT 100% TỪ SHAREPOINT -->
+        <div class="side-block" style="flex: 1; border-bottom: none; display: flex; flex-direction: column;">
+          <div class="side-title" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="svg-icon" style="width: 20px; height: 20px; color: var(--c-gold);">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+                </svg>
+              </span>
+              <span>VỪA NHẬN GẦN ĐÂY</span>
+            </div>
+            <span style="font-size: 11px; font-family: var(--font-body); font-weight: 700; color: #888;">TỰ ĐỘNG ĐỒNG BỘ</span>
+          </div>
+          <div class="live-feed-list" id="feed-container">
+            <div style="text-align: center; padding: 30px 10px; color: #888; font-weight: 700; font-size: 13px;">
+              Chưa có lượt nhận cơm nào hôm nay
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL CHI TIẾT TẤT CẢ SUẤT ĂN HÔM NAY (MÃ QR 'LIST' ĐỂ BẬT/TẮT) -->
+  <div id="list-modal" class="list-modal-overlay">
+    <div class="list-modal-box">
+      <div class="list-modal-header">
+        <div class="list-modal-title">📋 DANH SÁCH CHI TIẾT SUẤT ĂN HÔM NAY (<span id="modal-date-label"></span>)</div>
+        <button class="list-modal-close" onclick="toggleListModal(false)">ĐÓNG [ESC]</button>
+      </div>
+      <div class="list-modal-body">
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; font-weight: 800;">
+          <span style="color: var(--c-red);">Tổng đặt: <strong id="modal-total-count">0</strong></span>
+          <span style="color: #117A37;">Đã nhận: <strong id="modal-claimed-count">0</strong></span>
+          <span style="color: #D35400;">Chưa nhận: <strong id="modal-waiting-count">0</strong></span>
+          <span style="margin-left: auto; color: #888; font-size: 13px;">💡 Quét mã QR <strong>LIST</strong> để đóng/mở nhanh</span>
+        </div>
+        <table class="canteen-table">
+          <thead>
+            <tr>
+              <th style="width: 85px;">SỐ HIỆU</th>
+              <th>HỌ TÊN</th>
+              <th>CHỨC VỤ / BỘ PHẬN</th>
+              <th style="width: 105px; text-align: center;">NGÀY ĂN</th>
+              <th style="width: 95px; text-align: center;">GIỜ NHẬN</th>
+              <th style="width: 75px; text-align: center;">SỐ SUẤT</th>
+              <th style="width: 120px;">LOẠI MÓN</th>
+              <th style="width: 130px; text-align: center;">TRẠNG THÁI</th>
+            </tr>
+          </thead>
+          <tbody id="modal-table-body">
+            <tr><td colspan="8" style="text-align: center; color: #888; padding: 20px;">Đang tải danh sách...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000";
+
+    // AUDIO
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let hasPlayedIntroSound = false;
+
+    function playTone(freq, type, duration) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // ÂM THANH CHÀO ĐÓN KHI TRUY CẬP WEB (INTRO SOUND CHIME)
+    function soundIntro() {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        // 1. Âm nền trầm ấm (Warm Pad)
+        const bassOsc = audioCtx.createOscillator();
+        const bassGain = audioCtx.createGain();
+        bassOsc.type = 'sine';
+        bassOsc.frequency.setValueAtTime(130.81, now); // C3
+        bassGain.gain.setValueAtTime(0, now);
+        bassGain.gain.linearRampToValueAtTime(0.2, now + 0.3);
+        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 2.6);
+        bassOsc.connect(bassGain);
+        bassGain.connect(audioCtx.destination);
+        bassOsc.start(now);
+        bassOsc.stop(now + 2.6);
+
+        // 2. Chuỗi chuông hòa âm tươi sáng chào mừng (G4 -> C5 -> E5 -> G5 -> C6 ngân vang)
+        const notes = [
+          { f: 392.00, t: 0.15, d: 1.2 }, // G4
+          { f: 523.25, t: 0.45, d: 1.4 }, // C5
+          { f: 659.25, t: 0.75, d: 1.6 }, // E5
+          { f: 783.99, t: 1.05, d: 1.8 }, // G5
+          { f: 1046.50, t: 1.35, d: 2.5 } // C6 (ngân dài thanh thoát)
+        ];
+
+        notes.forEach(n => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(n.f, now + n.t);
+
+          gain.gain.setValueAtTime(0, now + n.t);
+          gain.gain.linearRampToValueAtTime(0.25, now + n.t + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + n.t);
+          osc.stop(now + n.t + n.d);
+        });
+      } catch (err) {
+        console.warn("Lỗi phát âm thanh intro:", err);
+      }
+    }
+
+    function soundReady() {
+      playTone(587.33, 'triangle', 0.12);
+      setTimeout(() => playTone(880.00, 'sine', 0.28), 110);
+    }
+
+    function tryPlayIntroSound() {
+      if (hasPlayedIntroSound) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          if (!hasPlayedIntroSound) {
+            hasPlayedIntroSound = true;
+            soundIntro();
+          }
+        }).catch(() => {});
+      } else {
+        hasPlayedIntroSound = true;
+        soundIntro();
+      }
+    }
+
+    // ==========================================
+    // INTRO ANIMATION CONTROLLER
+    // ==========================================
+    function dismissIntro() {
+      const overlay = document.getElementById('intro-overlay');
+      if (overlay && !overlay.classList.contains('fade-out')) {
+        soundReady();
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          focusScanner();
+        }, 650);
+      }
+    }
+
+    // Tự động kích hoạt âm thanh & tắt Intro sau 5 giây
+    window.addEventListener('DOMContentLoaded', () => {
+      tryPlayIntroSound();
+      setTimeout(dismissIntro, 5000);
+    });
+
+    // Mở khóa âm thanh ngay khi người dùng chạm hoặc click chuột lần đầu
+    ['click', 'keydown', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (!hasPlayedIntroSound) {
+          tryPlayIntroSound();
+        }
+      }, { once: false });
+    });
+
+    function soundSuccess() {
+      playTone(523.25, 'triangle', 0.12);
+      setTimeout(() => playTone(659.25, 'triangle', 0.12), 100);
+      setTimeout(() => playTone(783.99, 'triangle', 0.25), 200);
+    }
+    function soundWarning() {
+      playTone(440, 'sawtooth', 0.15);
+      setTimeout(() => playTone(330, 'sawtooth', 0.25), 160);
+    }
+    function soundError() {
+      playTone(200, 'square', 0.2);
+      setTimeout(() => playTone(180, 'square', 0.3), 200);
+    }
+    function speakVietnamese(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'vi-VN';
+        utter.rate = 1.05;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    // CLOCK
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock-display').innerText = `${h}:${m}:${s}`;
+      
+      const days = ['CHỦ NHẬT', 'THỨ HAI', 'THỨ BA', 'THỨ TƯ', 'THỨ NĂM', 'THỨ SÁU', 'THỨ BẢY'];
+      const d = String(now.getDate()).padStart(2, '0');
+      const mo = String(now.getMonth() + 1).padStart(2, '0');
+      document.getElementById('date-display').innerText = `${days[now.getDay()]}, ${d}/${mo}/${now.getFullYear()}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // SHAREPOINT LIVE DATA
+    let cachedOrders = {};
+    let idleTimer = null;
+
+    async function refreshTodayOrders() {
+      try {
+        const res = await fetch(`${API_BASE}/api/orders/today`);
+        const data = await res.json();
+        const spBadge = document.getElementById('sp-status');
+
+        if (data.status === "SUCCESS") {
+          cachedOrders = data.orders || {};
+          cachedAllOrders = data.allOrders || [];
+          updateStats(data.orders || {});
+          renderRecentClaimed(data.recentClaimed || []);
+          updateModalStats(data.allOrders || [], data.date);
+          if (isModalOpen) {
+            renderModalTable();
+          }
+          spBadge.innerText = "SHAREPOINT: ĐÃ KẾT NỐI";
+          spBadge.style.background = "#2ECC71";
+          spBadge.title = `Tài khoản: ${data.account || 'Hợp lệ'}`;
+        } else {
+          const errMsg = data.errorMessage || "CHƯA XÁC THỰC";
+          spBadge.innerText = `SP LỖI: ${errMsg}`;
+          spBadge.style.background = "#E74C3C";
+          spBadge.title = errMsg;
+        }
+      } catch (err) {
+        const spBadge = document.getElementById('sp-status');
+        spBadge.innerText = "SERVER LOCAL: MẤT KẾT NỐI";
+        spBadge.style.background = "#E67E22";
+      }
+    }
+
+    function updateModalStats(allOrders, dateStr) {
+      const dateLabel = document.getElementById('modal-date-label');
+      if (dateLabel && dateStr) {
+        dateLabel.innerText = dateStr;
+      }
+      let total = 0;
+      let claimed = 0;
+      let waiting = 0;
+      (allOrders || []).forEach(item => {
+        const qty = item.quantity || 1;
+        total += qty;
+        if (item.status === "Đã nhận cơm") {
+          claimed += qty;
+        } else {
+          waiting += qty;
+        }
+      });
+      const elTotal = document.getElementById('modal-total-count');
+      const elClaimed = document.getElementById('modal-claimed-count');
+      const elWaiting = document.getElementById('modal-waiting-count');
+      if (elTotal) elTotal.innerText = total;
+      if (elClaimed) elClaimed.innerText = claimed;
+      if (elWaiting) elWaiting.innerText = waiting;
+    }
+
+    function updateStats(orders) {
+      const list = Object.values(orders);
+      let totalMeals = 0;
+      let claimedMeals = 0;
+
+      list.forEach(item => {
+        const qty = item.quantity || 1;
+        totalMeals += qty;
+        if (item.status === "Đã nhận cơm") {
+          claimedMeals += qty;
+        }
+      });
+
+      document.getElementById('stat-total').innerText = totalMeals;
+      document.getElementById('stat-claimed').innerText = claimedMeals;
+      document.getElementById('stat-remaining').innerText = Math.max(0, totalMeals - claimedMeals);
+    }
+
+    function renderRecentClaimed(claimedList) {
+      const container = document.getElementById('feed-container');
+      container.innerHTML = '';
+
+      if (!claimedList || claimedList.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px 10px; color: #888; font-weight: 700; font-size: 13px;">
+            Chưa có lượt nhận cơm nào hôm nay
+          </div>
+        `;
+        return;
+      }
+
+      claimedList.slice(0, 8).forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'feed-card';
+        card.innerHTML = `
+          <div>
+            <div class="feed-name">${item.name} (${item.empId})</div>
+            <div class="feed-meal">${item.meal}</div>
+          </div>
+          <div class="feed-time" style="display: inline-flex; align-items: center; gap: 4px;">
+            <svg style="width: 14px; height: 14px; fill: #117A37;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span>${item.time}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    refreshTodayOrders();
+    setInterval(refreshTodayOrders, 12000);
+
+    // CHECK-IN
+    function parseBadgeScanString(raw) {
+      const clean = (raw || '').trim();
+      if (clean.includes('|')) {
+        const parts = clean.split('|');
+        return {
+          empId: (parts[0] || '').trim(),
+          rawName: (parts[1] || '').trim(),
+          rawRole: (parts[2] || '').trim()
+        };
+      }
+      return { empId: clean, rawName: "", rawRole: "" };
+    }
+
+    function isListTrigger(raw) {
+      if (!raw) return false;
+      const s = String(raw).trim();
+      const upper = s.toUpperCase();
+      
+      // Xử lý bộ gõ tiếng Việt Telex (Unikey/EVKey: L-I-S-T -> Lít / LÍT -> bỏ dấu thành LIT)
+      const noTone = upper.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Đ/g, 'D');
+      const alphaOnly = noTone.replace(/[^A-Z0-9]/g, '');
+      const rawAlpha = upper.replace(/[^A-Z0-9]/g, '');
+
+      if (upper === "LIST" || rawAlpha === "LIST") return true;
+      if (upper === "LÍT" || upper === "LÍ T" || alphaOnly === "LIT" || alphaOnly === "LIST") return true;
+      if (upper.startsWith("LIST") || upper.endsWith("LIST") || upper.includes("LIST")) return true;
+
+      return false;
+    }
+
+    async function processCheckIn(rawString) {
+      clearTimeout(idleTimer);
+      const cleanRaw = (rawString || "").trim();
+      if (!cleanRaw) return;
+
+      const parsed = parseBadgeScanString(cleanRaw);
+      const empId = parsed.empId;
+
+      // Quét mã Barcode/QR hoặc gõ phím "LIST" để bật/tắt danh sách chi tiết hôm nay
+      if (isListTrigger(cleanRaw) || isListTrigger(empId)) {
+        soundReady();
+        toggleListModal();
+        return;
+      }
+
+      // Tự động đóng modal nếu đang mở để hiển thị thẻ nhận cơm
+      if (isModalOpen) {
+        toggleListModal(false);
+      }
+
+      const viewIdle = document.getElementById('view-idle');
+      const viewResult = document.getElementById('view-result');
+      viewIdle.style.display = 'none';
+      viewResult.style.display = 'block';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/checkin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ maNV: empId, rawScan: rawString })
+        });
+        const result = await res.json();
+
+        // 1. HỢP LỆ
+        if (result.status === "SUCCESS") {
+          const order = result.order;
+          const qty = order.quantity || 1;
+          const timeStr = order.claimedAt || new Date().toTimeString().split(' ')[0];
+
+          let quantityHtml = "";
+          if (qty > 1) {
+            quantityHtml = `
+              <div class="quantity-banner" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                <span>ĐẶT ${qty} SUẤT ĂN — ĐẦU BẾP PHÁT ĐỦ ${qty} KHAY!</span>
+              </div>
+            `;
+          } else {
+            quantityHtml = `
+              <div style="background: #E8F8EE; border: 2px solid #117A37; color: #117A37; font-family: var(--font-display); font-size: 20px; padding: 8px; text-align: center; margin-bottom: 14px;">
+                SỐ LƯỢNG: 1 SUẤT ĂN
+              </div>
+            `;
+          }
+
+          viewResult.innerHTML = `
+            <div class="meal-ticket-card" style="border-color: #117A37; box-shadow: 8px 8px 0px #117A37;">
+              <div class="stamp-approved">ĐÃ DUYỆT</div>
+              <div class="ticket-header-row" style="border-color: #117A37;">
+                <span class="ticket-tag" style="background: #117A37; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                  CHECK-IN THÀNH CÔNG
+                </span>
+                <span class="ticket-time">GIỜ NHẬN: ${timeStr}</span>
+              </div>
+              
+              <div class="emp-name-big" style="color: #117A37;">${order.fullName || parsed.rawName}</div>
+              <div class="emp-meta-row">
+                <span>MÃ NV: <strong>${order.empId}</strong></span>
+                <span>•</span>
+                <span>CHỨC DANH: <strong>${order.role}</strong></span>
+              </div>
+
+              ${quantityHtml}
+
+              <div class="meal-choice-box" style="border-color: #117A37; background: #E8F8EE;">
+                <div class="meal-icon" style="width: 44px; height: 44px; color: #117A37; display: flex; align-items: center;">
+                  <svg viewBox="0 0 64 64" fill="currentColor" style="width:100%; height:100%;">
+                    <circle cx="32" cy="14" r="5"/>
+                    <path d="M10 40C10 25.64 20.08 14 32 14C43.92 14 54 25.64 54 40H10Z"/>
+                    <rect x="6" y="42" width="52" height="6" rx="3"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 800; color: #117A37;">LOẠI SUẤT ĂN:</div>
+                  <div class="meal-name" style="color: #117A37;">${order.mealType}</div>
+                </div>
+              </div>
+
+              <div style="text-align: center; font-weight: 800; font-size: 15px; color: #117A37; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.48L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1 1H2c-.55 0-1-.45-1-1zm15.03-7c0-8-15.03-8-15.03 0h15.03zM1.02 17h15v2h-15z"/></svg>
+                <span>CHÚC BẠN BỮA TRƯA NGON MIỆNG TẠI SEAZEN!</span>
+              </div>
+            </div>
+          `;
+
+          soundSuccess();
+          speakVietnamese(`Xin nhận cơm. Chúc bạn ngon miệng.`);
+          refreshTodayOrders();
+        }
+        // 2. ĐÃ NHẬN RỒI
+        else if (result.status === "ALREADY_CLAIMED") {
+          const order = result.order;
+          viewResult.innerHTML = `
+            <div class="meal-ticket-card" style="border-color: #D35400; box-shadow: 8px 8px 0px #D35400;">
+              <div class="ticket-header-row" style="border-color: #D35400;">
+                <span class="ticket-tag" style="background: #D35400; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                  CẢNH BÁO: ĐÃ LẤY CƠM
+                </span>
+                <span class="ticket-time">LÚC ${order.claimedAt || '11:30'}</span>
+              </div>
+              <div class="emp-name-big" style="color: #D35400;">${order.fullName}</div>
+              <div class="emp-meta-row">
+                <span>MÃ NV: <strong>${order.empId}</strong></span>
+                <span>•</span>
+                <span>ĐÃ NHẬN: <strong>${order.quantity} suất</strong></span>
+              </div>
+              <div class="meal-choice-box" style="border-color: #D35400; background: #FFF3CD;">
+                <div class="meal-icon" style="width: 40px; height: 40px; color: #D35400; display: flex; align-items: center;">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                </div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 800; color: #D35400;">TRẠNG THÁI:</div>
+                  <div class="meal-name" style="color: #D35400; font-size: 20px;">
+                    BẠN ĐÃ NHẬN ĐỦ SUẤT ĂN!
+                  </div>
+                </div>
+              </div>
+              <div style="font-weight: 700; font-size: 13px; color: #666; text-align: center;">
+                Mỗi nhân viên chỉ nhận 1 lần theo số suất đã đăng ký. Vui lòng liên hệ Kế toán nếu cần hỗ trợ.
+              </div>
+            </div>
+          `;
+          soundWarning();
+          speakVietnamese(`Bạn đã nhận đủ suất`);
+        }
+        // 3. CHƯA ĐĂNG KÝ
+        else {
+          viewResult.innerHTML = `
+            <div class="meal-ticket-card" style="border-color: var(--c-red); box-shadow: 8px 8px 0px var(--c-red military);">
+              <div class="ticket-header-row">
+                <span class="ticket-tag" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                  CHƯA ĐĂNG KÝ
+                </span>
+                <span class="ticket-time">HÔM NAY</span>
+              </div>
+              <div class="emp-name-big">${parsed.rawName || `NHÂN VIÊN (${empId})`}</div>
+              <div class="emp-meta-row">
+                <span>MÃ NV: <strong>${empId}</strong></span>
+              </div>
+              <div class="meal-choice-box" style="background: #FDEDEC;">
+                <div class="meal-icon" style="width: 40px; height: 40px; color: var(--c-red); display: flex; align-items: center;">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                </div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 800; color: var(--c-red);">THÔNG BÁO:</div>
+                  <div class="meal-name" style="font-size: 20px;">
+                    BẠN CHƯA ĐĂNG KÝ CƠM TRÊN APP!
+                  </div>
+                </div>
+              </div>
+              <div style="font-weight: 700; font-size: 13px; color: #666; text-align: center;">
+                Hạn chốt đăng ký trước 09:30 sáng. Vui lòng gặp Quản lý Bếp để kiểm tra suất dư!
+              </div>
+            </div>
+          `;
+          soundError();
+          speakVietnamese(`Bạn chưa đăng kí cơm trưa hôm nay`);
+        }
+      } catch (err) {
+        console.error("Lỗi:", err);
+      }
+
+      idleTimer = setTimeout(resetToIdle, 4500);
+    }
+
+    // MODAL DANH SÁCH CHI TIẾT (MÃ QR 'LIST')
+    let cachedAllOrders = [];
+    let isModalOpen = false;
+
+    function toggleListModal(forceState) {
+      const modal = document.getElementById('list-modal');
+      if (!modal) return;
+
+      const isCurrentlyVisible = (modal.style.display === 'flex' || window.getComputedStyle(modal).display === 'flex');
+      if (typeof forceState === 'boolean') {
+        isModalOpen = forceState;
+      } else {
+        isModalOpen = !isCurrentlyVisible;
+      }
+
+      modal.style.display = isModalOpen ? 'flex' : 'none';
+      if (isModalOpen) {
+        renderModalTable();
+      }
+      focusScanner();
+    }
+
+    function renderModalTable() {
+      const tbody = document.getElementById('modal-table-body');
+      tbody.innerHTML = '';
+
+      if (!cachedAllOrders || cachedAllOrders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; padding: 25px;">Chưa có đơn đăng ký cơm nào trong hôm nay</td></tr>';
+        return;
+      }
+
+      // Sắp xếp: Ai đã nhận cơm và mới nhận lên đầu, sau đó đến chưa nhận
+      const sorted = [...cachedAllOrders].sort((a, b) => {
+        if (a.status === "Đã nhận cơm" && b.status !== "Đã nhận cơm") return -1;
+        if (a.status !== "Đã nhận cơm" && b.status === "Đã nhận cơm") return 1;
+        return (b.claimedAt || '').localeCompare(a.claimedAt || '');
+      });
+
+      sorted.forEach(item => {
+        const tr = document.createElement('tr');
+        const isClaimed = (item.status === "Đã nhận cơm");
+        const statusBadge = isClaimed 
+          ? `<span class="badge-status-claimed">✓ ĐÃ NHẬN</span>` 
+          : `<span class="badge-status-waiting">⏳ ĐÃ ĐĂNG KÝ</span>`;
+
+        tr.innerHTML = `
+          <td><strong>${item.empId || '-'}</strong></td>
+          <td>${item.fullName || '-'}</td>
+          <td>${item.role || '-'}</td>
+          <td style="text-align: center; font-weight: 600;">${item.mealDate || '--/--/----'}</td>
+          <td style="text-align: center; font-weight: 700; color: ${isClaimed ? '#117A37' : '#999'};">${item.claimedAt || '--:--'}</td>
+          <td style="text-align: center; font-weight: 800;">${item.quantity || 1}</td>
+          <td>${item.mealType || 'Món mặn'}</td>
+          <td style="text-align: center;">${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetToIdle() {
+      clearTimeout(idleTimer);
+      document.getElementById('view-result').style.display = 'none';
+      document.getElementById('view-idle').style.display = 'flex';
+      focusScanner();
+    }
+
+    // USB SCANNER LISTENER & GLOBAL KEYBOARD FALLBACK BUFFER
+    const hiddenInput = document.getElementById('scanner-hidden-input');
+    let scanBuffer = "";
+    let lastKeyTime = 0;
+
+    function focusScanner() {
+      if (hiddenInput && document.activeElement !== hiddenInput) {
+        hiddenInput.focus();
+      }
+    }
+
+    window.addEventListener('click', focusScanner);
+    window.addEventListener('focus', focusScanner);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) focusScanner();
+    });
+    setInterval(focusScanner, 1500);
+    focusScanner();
+
+    // 1. Lắng nghe trực tiếp trên hiddenInput
+    hiddenInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = hiddenInput.value;
+        hiddenInput.value = '';
+        scanBuffer = '';
+        if (val && val.trim().length > 0) {
+          processCheckIn(val);
+        }
+      }
+    });
+
+    // 2. Lắng nghe toàn cục trên window (Bắt 100% mã quét hoặc gõ LIST ngay cả khi mất focus)
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (isModalOpen) toggleListModal(false);
+        return;
+      }
+
+      if (e.target === hiddenInput) return;
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const finalVal = (hiddenInput ? hiddenInput.value : '') || scanBuffer;
+        if (hiddenInput) hiddenInput.value = '';
+        scanBuffer = '';
+        if (finalVal && finalVal.trim().length > 0) {
+          processCheckIn(finalVal);
+        }
+        focusScanner();
+        return;
+      }
+
+      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        const now = Date.now();
+        if (now - lastKeyTime > 1200) {
+          scanBuffer = '';
+        }
+        scanBuffer += e.key;
+        lastKeyTime = now;
+      }
+      focusScanner();
+    });
+  </script>
+</body>
+</html>
