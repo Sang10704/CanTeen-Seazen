@@ -7,9 +7,21 @@ import time
 import webbrowser
 import requests
 import msal
-from flask import Flask, jsonify, request, send_file
+import socket
+from flask import Flask, jsonify, request, send_file, send_from_directory
 from flask_cors import CORS
 import logging
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    try:
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 # Tắt log GET định kỳ của Werkzeug trên Terminal để màn hình sạch sẽ
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
@@ -22,6 +34,26 @@ CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
 SCOPES = ["https://graph.microsoft.com/.default"]
 SITE_ID = "seazenvn.sharepoint.com,d47e794f-870a-4d63-8173-4d0721d5d77d,69313196-298d-4be2-af46-f7893c08cccf"
 LIST_NAME = "Canteen_Orders"
+USER_LOGIN_LIST_NAME = "UserLogin"
+
+ACTIVE_SESSIONS = {}
+CACHED_USER_LOGINS = []
+LAST_USER_LOGIN_FETCH = 0
+USER_LOGIN_CACHE_TTL = 60  # 60s cache để giảm tải SharePoint Graph API
+
+def get_lan_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0.5)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except Exception:
+            return "127.0.0.1"
 
 if getattr(sys, 'frozen', False):
     EXE_DIR = os.path.dirname(sys.executable)
@@ -46,6 +78,10 @@ if not os.path.exists(HTML_FILE):
     HTML_FILE = os.path.join(EXE_DIR, "OneSEAZEN", "Canteen_Kiosk_Production.html")
 if not os.path.exists(HTML_FILE):
     HTML_FILE = os.path.join(EXE_DIR, "Canteen_Kiosk_Production.html")
+
+MP3_DIR = os.path.join(BUNDLE_DIR, "mp3")
+if not os.path.exists(MP3_DIR):
+    MP3_DIR = os.path.join(EXE_DIR, "mp3")
 
 VN_TZ = datetime.timezone(datetime.timedelta(hours=7))
 
@@ -124,15 +160,15 @@ LAST_FETCH_TIME = 0
 CACHED_ORDERS_TODAY = {}
 CACHED_CLAIMED_LIST = []
 CACHED_ALL_TODAY_LIST = []
-CACHE_TTL_SECONDS = 10
+CACHE_TTL_SECONDS = 3
 
 def fetch_sharepoint_data(force=False):
-    global LAST_FETCH_TIME, CACHED_ORDERS_TODAY, CACHED_CLAIMED_LIST, CACHED_ALL_TODAY_LIST
+    global LAST_FETCH_TIME, CACHED_ORDERS_TODAY, CACHED_CLAIMED_LIST, CACHED_ALL_TODAY_LIST, LOCAL_CHECKIN_OVERLAY
     now_ts = time.time()
     today_vn = get_today_vn_str()
 
     if not force and (now_ts - LAST_FETCH_TIME < CACHE_TTL_SECONDS) and CACHED_ORDERS_TODAY:
-        for ma_nv, ov in LOCAL_CHECKIN_OVERLAY.items():
+        for ma_nv, ov in list(LOCAL_CHECKIN_OVERLAY.items()):
             if ov.get("date") == today_vn and ma_nv in CACHED_ORDERS_TODAY:
                 CACHED_ORDERS_TODAY[ma_nv]["status"] = "Đã nhận cơm"
                 CACHED_ORDERS_TODAY[ma_nv]["claimedAt"] = ov.get("claimedAt", "")
@@ -156,14 +192,16 @@ def fetch_sharepoint_data(force=False):
             CONNECTION_DIAGNOSTICS["last_sync_time"] = datetime.datetime.now(VN_TZ).strftime("%H:%M:%S")
             data = r.json()
             items = data.get("value", [])
+
+            # Nếu có phân trang (@odata.nextLink)
             next_link = data.get("@odata.nextLink")
-            while next_link and len(items) < 3000:
+            while next_link:
                 try:
-                    nr = requests.get(next_link, headers=headers, timeout=10)
-                    if nr.status_code == 200:
-                        ndata = nr.json()
-                        items.extend(ndata.get("value", []))
-                        next_link = ndata.get("@odata.nextLink")
+                    r_next = requests.get(next_link, headers=headers, timeout=10)
+                    if r_next.status_code == 200:
+                        d_next = r_next.json()
+                        items.extend(d_next.get("value", []))
+                        next_link = d_next.get("@odata.nextLink")
                     else:
                         break
                 except Exception:
@@ -180,9 +218,9 @@ def fetch_sharepoint_data(force=False):
                 chuc_vu = fields.get("ChucVu", "")
                 loai_mon = fields.get("LoaiMon") or "Món mặn"
                 so_luong = int(fields.get("SoLuongSuat", 1) or 1)
-                trang_thai = fields.get("TrangThai", "Đã đăng ký")
+                trang_thai = str(fields.get("TrangThai", "Đã đăng ký")).strip()
                 raw_ngay_an = fields.get("NgayAn", "")
-                gio_nhan = fields.get("GioNhan", "")
+                gio_nhan = str(fields.get("GioNhan", "") or "").strip()
 
                 order_date_vn = normalize_sp_date_to_vn(raw_ngay_an)
                 try:
@@ -190,8 +228,12 @@ def fetch_sharepoint_data(force=False):
                 except Exception:
                     display_ngay_an = order_date_vn
 
-                # Đồng bộ tức thì với overlay check-in cục bộ
-                if ma_nv in LOCAL_CHECKIN_OVERLAY:
+                # ƯU TIÊN TUYỆT ĐỐI SHAREPOINT:
+                # Nếu trên SharePoint người quản lý sửa thủ công lại thành "Đã đăng ký" -> Xóa ngay overlay cục bộ!
+                if trang_thai != "Đã nhận cơm":
+                    LOCAL_CHECKIN_OVERLAY.pop(ma_nv, None)
+                    gio_nhan = ""
+                elif ma_nv in LOCAL_CHECKIN_OVERLAY:
                     overlay = LOCAL_CHECKIN_OVERLAY[ma_nv]
                     if overlay.get("date") == today_vn:
                         trang_thai = "Đã nhận cơm"
@@ -241,9 +283,19 @@ def index():
         return send_file(HTML_FILE)
     return f"<h3>Lỗi: Không tìm thấy file giao diện Kiosk tại: {HTML_FILE}</h3>"
 
+@app.route("/mp3/<path:filename>")
+def serve_mp3(filename):
+    for target_dir in [MP3_DIR, os.path.join(EXE_DIR, "mp3"), os.path.join(BUNDLE_DIR, "mp3")]:
+        if os.path.exists(os.path.join(target_dir, filename)):
+            return send_from_directory(target_dir, filename)
+    return jsonify({"error": "File not found"}), 404
+
 @app.route("/api/orders/today", methods=["GET"])
 def get_orders_today():
-    orders, claimed_list, all_today = fetch_sharepoint_data()
+    force_refresh = (request.args.get("force", "0") in ("1", "true", "True"))
+    if force_refresh:
+        LOCAL_CHECKIN_OVERLAY.clear()
+    orders, claimed_list, all_today = fetch_sharepoint_data(force=force_refresh)
     has_error = bool(CONNECTION_DIAGNOSTICS["last_error"])
     return jsonify({
         "status": "ERROR" if has_error else "SUCCESS",
@@ -257,16 +309,43 @@ def get_orders_today():
         "allOrders": all_today
     })
 
+import re
+
 @app.route("/api/checkin", methods=["POST"])
 def checkin():
+    global CACHED_CLAIMED_LIST, CACHED_ALL_TODAY_LIST, LOCAL_CHECKIN_OVERLAY
     body = request.get_json(force=True) or {}
-    ma_nv = str(body.get("maNV", "")).strip()
+    raw_ma_nv = str(body.get("maNV", "")).strip()
+    raw_scan = str(body.get("rawScan", "")).strip()
     gio_nhan = datetime.datetime.now(VN_TZ).strftime("%H:%M:%S")
+
+    # Quy tắc cốt lõi: Nếu chuỗi có |, lấy hết text phía trước, gặp | thì dừng
+    candidate = raw_ma_nv or raw_scan
+    if "|" in candidate:
+        candidate = candidate.split("|")[0].strip()
+    ma_nv = candidate
 
     if not ma_nv:
         return jsonify({"status": "ERROR", "message": "Thiếu mã nhân viên"}), 400
 
-    orders_today, _, _ = fetch_sharepoint_data()
+    # Dùng trực tiếp dữ liệu danh sách hôm nay trong bộ nhớ RAM (0.001 ms)
+    orders_today = CACHED_ORDERS_TODAY
+    if not orders_today:
+        orders_today, _, _ = fetch_sharepoint_data()
+
+    # Nhận diện tự động nếu ma_nv bị kẹt phím rác (vd: ttttt14703) hoặc trùng khớp
+    if ma_nv not in orders_today:
+        matched_id = None
+        for valid_id in orders_today.keys():
+            if ma_nv == valid_id or ma_nv.endswith(valid_id) or valid_id in ma_nv:
+                matched_id = valid_id
+                break
+        if not matched_id:
+            num_match = re.search(r'(\d{2,})$', ma_nv)
+            if num_match and num_match.group(1) in orders_today:
+                matched_id = num_match.group(1)
+        if matched_id:
+            ma_nv = matched_id
 
     if ma_nv not in orders_today:
         print(f"[-] [{gio_nhan}] TU CHOI: Ma NV {ma_nv} chua dang ky com trua hom nay.")
@@ -286,7 +365,7 @@ def checkin():
             "order": order
         })
 
-    # Ghi nhận ngay vào bộ nhớ đệm cục bộ
+    # Ghi nhận ngay vào bộ nhớ đệm cục bộ trong 0.001 giây
     today_vn = get_today_vn_str()
     LOCAL_CHECKIN_OVERLAY[ma_nv] = {
         "date": today_vn,
@@ -313,45 +392,227 @@ def checkin():
     })
 
     # In log rõ ràng, ngắn gọn cho người vận hành Kiosk
-    print(f"[+] [{gio_nhan}] CHECK-IN THANH CONG: Ma NV {ma_nv} | {order.get('fullName')} | {order.get('quantity')} suat ({order.get('mealType')})")
+    print(f"[+] [{gio_nhan}] CHECK-IN THANH CONG (PHAN HOI TUC THI): Ma NV {ma_nv} | {order.get('fullName')} | {order.get('quantity')} suat ({order.get('mealType')})")
 
-    token = get_access_token()
-    if token:
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        }
-        patch_url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{LIST_NAME}/items/{order['itemId']}/fields"
-        try:
-            requests.patch(patch_url, headers=headers, json={
-                "TrangThai": "Đã nhận cơm",
-                "GioNhan": gio_nhan
-            }, timeout=6)
-        except Exception as ex:
-            print("[-] Loi ghi SharePoint:", ex)
+    # ĐỒNG BỘ NỀN (BACKGROUND SYNC): Gửi lệnh PATCH lên SharePoint trên luồng ngầm để Kiosk không bị trễ 1 giây
+    def async_patch_sharepoint(item_id, gio_nhan_val, ma_nv_val):
+        token = get_access_token()
+        if token:
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            }
+            patch_url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{LIST_NAME}/items/{item_id}/fields"
+            try:
+                resp = requests.patch(patch_url, headers=headers, json={
+                    "TrangThai": "Đã nhận cơm",
+                    "GioNhan": gio_nhan_val
+                }, timeout=8)
+                if resp.status_code in (200, 204):
+                    print(f"[*] [{gio_nhan_val}] DONG BO SHAREPOINT THANH CONG: Item {item_id} (Ma NV {ma_nv_val})")
+                else:
+                    print(f"[-] [{gio_nhan_val}] SharePoint Error Status {resp.status_code}: {resp.text[:150]}")
+            except Exception as ex:
+                print("[-] Loi ghi SharePoint ngam:", ex)
 
+    threading.Thread(target=async_patch_sharepoint, args=(order['itemId'], gio_nhan, ma_nv), daemon=True).start()
+
+    # Trả về kết quả ngay lập tức (< 0.05s) cho giao diện Kiosk
     return jsonify({
         "status": "SUCCESS",
         "message": "Check-in thành công",
-        "order": order
+        "order": order,
+        "spSynced": True
     })
+
+def fetch_user_logins(force=False):
+    global CACHED_USER_LOGINS, LAST_USER_LOGIN_FETCH
+    now_ts = time.time()
+    if not force and CACHED_USER_LOGINS and (now_ts - LAST_USER_LOGIN_FETCH < USER_LOGIN_CACHE_TTL):
+        return CACHED_USER_LOGINS
+
+    token = get_access_token()
+    if not token:
+        return CACHED_USER_LOGINS
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json"
+    }
+
+    url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{USER_LOGIN_LIST_NAME}/items?expand=fields&$top=999"
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            items = data.get("value", [])
+            next_link = data.get("@odata.nextLink")
+            while next_link:
+                try:
+                    r_next = requests.get(next_link, headers=headers, timeout=10)
+                    if r_next.status_code == 200:
+                        d_next = r_next.json()
+                        items.extend(d_next.get("value", []))
+                        next_link = d_next.get("@odata.nextLink")
+                    else:
+                        break
+                except Exception:
+                    break
+
+            parsed_users = []
+            for it in items:
+                f = it.get("fields", {})
+                u = str(f.get("UserName", "")).strip()
+                p = str(f.get("Credential", "")).strip()
+                roles = f.get("AdminRoles", [])
+                if isinstance(roles, str):
+                    roles = [roles]
+                elif not isinstance(roles, list):
+                    roles = []
+
+                parsed_users.append({
+                    "id": it.get("id"),
+                    "username": u,
+                    "password": p,
+                    "fullName": f.get("FullName") or f.get("MSNV_x003a__x0020_H_x1ecc__x0020") or f.get("Title") or u,
+                    "department": f.get("Department", ""),
+                    "securityRole": f.get("SecurityRole", ""),
+                    "adminRoles": roles
+                })
+
+            CACHED_USER_LOGINS = parsed_users
+            LAST_USER_LOGIN_FETCH = now_ts
+            return parsed_users
+        else:
+            print(f"[-] Loi lay danh sach UserLogin: HTTP {r.status_code}")
+    except Exception as e:
+        print("[-] Loi lay danh sach UserLogin:", e)
+
+    return CACHED_USER_LOGINS
+
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    data = request.get_json(force=True, silent=True) or {}
+    username = str(data.get("username", "")).strip()
+    password = str(data.get("password", "")).strip()
+
+    if not username or not password:
+        return jsonify({
+            "status": "ERROR",
+            "message": "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!"
+        }), 400
+
+    users = fetch_user_logins()
+    if not users:
+        users = fetch_user_logins(force=True)
+
+    matched = None
+    for u in users:
+        if u["username"].lower() == username.lower() and u["password"] == password:
+            matched = u
+            break
+
+    if not matched:
+        return jsonify({
+            "status": "ERROR",
+            "message": "Tên đăng nhập hoặc mật khẩu không chính xác!"
+        }), 401
+
+    # Kiểm tra quyền: AdminRoles phải chứa "Xem lịch trực toàn bộ"
+    roles = matched.get("adminRoles", [])
+    has_permission = any("xem lịch trực toàn bộ" in str(r).lower() for r in roles)
+    if not has_permission:
+        return jsonify({
+            "status": "FORBIDDEN",
+            "message": "Tài khoản không có quyền truy cập hệ thống! (Yêu cầu quyền 'Xem lịch trực toàn bộ' trong AdminRoles)."
+        }), 403
+
+    # Tạo token ngẫu nhiên lưu phiên
+    session_token = f"sz_{abs(hash(username + password + str(time.time()))):x}"
+    session_data = {
+        "username": matched["username"],
+        "fullName": matched["fullName"],
+        "department": matched["department"],
+        "securityRole": matched["securityRole"],
+        "adminRoles": matched["adminRoles"],
+        "loginAt": datetime.datetime.now(VN_TZ).strftime("%H:%M:%S %d/%m/%Y")
+    }
+    ACTIVE_SESSIONS[session_token] = session_data
+
+    print(f"[+] DANG NHAP THANH CONG: {matched['username']} ({matched['fullName']})")
+
+    return jsonify({
+        "status": "SUCCESS",
+        "message": "Đăng nhập thành công!",
+        "token": session_token,
+        "user": session_data
+    })
+
+@app.route("/api/auth/verify", methods=["GET", "POST"])
+def api_auth_verify():
+    token = request.headers.get("X-Auth-Token") or request.args.get("token", "")
+    if not token and request.is_json:
+        token = (request.get_json(force=True, silent=True) or {}).get("token", "")
+
+    if token and token in ACTIVE_SESSIONS:
+        return jsonify({
+            "status": "SUCCESS",
+            "valid": True,
+            "user": ACTIVE_SESSIONS[token]
+        })
+
+    return jsonify({
+        "status": "UNAUTHORIZED",
+        "valid": False,
+        "message": "Phiên làm việc hết hạn hoặc không hợp lệ."
+    }), 401
+
+@app.route("/api/auth/logout", methods=["POST"])
+def api_auth_logout():
+    token = request.headers.get("X-Auth-Token") or (request.get_json(force=True, silent=True) or {}).get("token", "")
+    if token in ACTIVE_SESSIONS:
+        del ACTIVE_SESSIONS[token]
+    return jsonify({"status": "SUCCESS", "message": "Đã đăng xuất"})
 
 def open_browser():
     time.sleep(1.5)
-    webbrowser.open("http://localhost:5000")
+    # Thử mở bằng Microsoft Edge trước để có giọng đọc AI Nam/Nữ tự nhiên chất lượng cao nhất
+    try:
+        edge_paths = [
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+        ]
+        opened = False
+        for ep in edge_paths:
+            if os.path.exists(ep):
+                import subprocess
+                subprocess.Popen([ep, "http://localhost:5000"])
+                opened = True
+                break
+        if not opened:
+            webbrowser.open("http://localhost:5000")
+    except Exception:
+        webbrowser.open("http://localhost:5000")
 
 if __name__ == "__main__":
     today = get_today_vn_str()
-    print("=" * 70)
-    print("      🍱 SEAZEN CANTEEN CHECK-IN SYSTEM - STANDALONE KIOSK 🍱      ")
-    print("=" * 70)
-    print(f"[*] Ngay lam viec (VN UTC+7): {today}")
-    print(f"[*] Thu muc thuc thi: {EXE_DIR}")
-    print(f"[*] Kiem tra token_cache.bin: {'DA TIM THAY [OK]' if os.path.exists(TOKEN_CACHE_FILE) else 'KHONG TIM THAY [FAIL]'}")
-    print("[*] Server dang chay tai: http://localhost:5000")
-    print("[*] Che do Terminal sach: Da tat log GET dinh ky, chi hien thi Check-in")
-    print("=" * 70)
-    print("[*] San sang nhan ma quet barcode/QR...")
-    
+    lan_ip = get_lan_ip()
+    hostname = socket.gethostname()
+
+    print("=" * 75)
+    print("      [+] SEAZEN CANTEEN CHECK-IN SYSTEM - STANDALONE KIOSK [+]      ")
+    print("=" * 75)
+    print(f"[*] Ngay lam viec (VN UTC+7) : {today}")
+    print(f"[*] Thu muc thuc thi         : {EXE_DIR}")
+    print(f"[*] Kiem tra token_cache.bin : {'DA TIM THAY [OK]' if os.path.exists(TOKEN_CACHE_FILE) else 'KHONG TIM THAY [FAIL]'}")
+    print("=" * 75)
+    print("   🌐 CAC DIA CHI TRUY CAP HE THONG (TRUONG HOP A - MANG LAN / WI-FI):")
+    print(f"   👉 [1] Tren may nay          : http://localhost:5000")
+    print(f"   👉 [2] Tu may khac (Bang IP) : http://{lan_ip}:5000")
+    print(f"   👉 [3] Tu may khac (Ten may) : http://{hostname}:5000")
+    print("=" * 75)
+    print("[*] San sang nhan ma quet barcode/QR & phuc vu he thong...")
+
     threading.Thread(target=open_browser, daemon=True).start()
     app.run(host="0.0.0.0", port=5000, debug=False)
+

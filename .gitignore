@@ -22,3 +22,7 @@ dist/
 *.swp
 *.bak
 Thumbs.db
+
+# Release packages & archives
+*.zip
+SEAZEN_Canteen_Kiosk_Package/

@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['d:/Công việc/PowerApp/Canteen_Kiosk_Runner.py'],
+    ['Canteen_Kiosk_Runner.py'],
     pathex=[],
     binaries=[],
-    datas=[('OneSEAZEN/Canteen_Kiosk_Production.html', '.'), ('token_cache.bin', '.')],
+    datas=[('Canteen_Kiosk_Production.html', '.'), ('token_cache.bin', '.'), ('mp3', 'mp3')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['canteen_icon.ico'],
 )
