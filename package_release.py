@@ -1,126 +1,86 @@
+# -*- coding: utf-8 -*-
+"""
+Kịch bản đóng gói ứng dụng SEAZEN Canteen Kiosk thành 1 file EXE độc lập duy nhất.
+Chỉ cần gửi 1 file SEAZEN_Canteen_Kiosk.exe đi là chạy được trên máy trạm.
+"""
+
 import os
+import sys
 import shutil
-import zipfile
+import subprocess
+
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PACKAGE_DIR = os.path.join(BASE_DIR, "SEAZEN_Canteen_Kiosk_Package")
-ZIP_OUTPUT = os.path.join(BASE_DIR, "SEAZEN_Canteen_Kiosk_Full_Package.zip")
+SPEC_FILE = os.path.join(BASE_DIR, "SEAZEN_Canteen_Kiosk.spec")
+DIST_DIR = os.path.join(BASE_DIR, "dist")
+OUTPUT_EXE = os.path.join(DIST_DIR, "SEAZEN_Canteen_Kiosk.exe")
+ROOT_EXE = os.path.join(BASE_DIR, "SEAZEN_Canteen_Kiosk.exe")
+README_FILE = os.path.join(BASE_DIR, "HUONG_DAN_SU_DUNG.txt")
 
-print("[*] Bat dau dong goi...")
+def main():
+    print("=" * 70)
+    print("   DONG GOI SEAZEN CANTEEN KIOSK - BAN STANDALONE 1 FILE EXE")
+    print("=" * 70)
 
-# 1. Tao thu muc package
-os.makedirs(PACKAGE_DIR, exist_ok=True)
-try:
-    for item in os.listdir(PACKAGE_DIR):
-        item_path = os.path.join(PACKAGE_DIR, item)
-        if item != "SEAZEN_Canteen_Kiosk.exe":
-            if os.path.isdir(item_path):
-                shutil.rmtree(item_path, ignore_errors=True)
-            else:
-                try:
-                    os.remove(item_path)
-                except Exception:
-                    pass
-except Exception:
-    pass
+    # 1. Thực thi PyInstaller
+    print("[*] Dang bien dich ma nguon voi PyInstaller...")
+    cmd = [sys.executable, "-m", "PyInstaller", "--clean", "-y", SPEC_FILE]
+    res = subprocess.run(cmd, cwd=BASE_DIR)
 
-# 2. Sao chep cac file can thiet
-files_to_copy = [
-    (os.path.join(BASE_DIR, "dist", "SEAZEN_Canteen_Kiosk.exe"), "SEAZEN_Canteen_Kiosk.exe"),
-    (os.path.join(BASE_DIR, "token_cache.bin"), "token_cache.bin"),
-    (os.path.join(BASE_DIR, "Canteen_Kiosk_Production.html"), "Canteen_Kiosk_Production.html"),
-    (os.path.join(BASE_DIR, "CHAY_CANTEEN_KIOSK.bat"), "CHAY_CANTEEN_KIOSK.bat"),
-    (os.path.join(BASE_DIR, "canteen_icon.ico"), "canteen_icon.ico"),
-    (os.path.join(BASE_DIR, "tao_token_moi.py"), "tao_token_moi.py"),
-    (os.path.join(BASE_DIR, "DANG_NHAP_TAI_KHOAN_MOI.bat"), "DANG_NHAP_TAI_KHOAN_MOI.bat"),
-    (os.path.join(BASE_DIR, "MO_CONG_FIREWALL_LAN.bat"), "MO_CONG_FIREWALL_LAN.bat"),
-]
+    if res.returncode != 0 or not os.path.exists(OUTPUT_EXE):
+        print(f"[-] Bien dich that bai! Ma loi: {res.returncode}")
+        sys.exit(1)
 
-for src, dst_name in files_to_copy:
-    if os.path.exists(src):
-        dst = os.path.join(PACKAGE_DIR, dst_name)
-        try:
-            shutil.copy2(src, dst)
-            print(f" [+] Da copy: {dst_name}")
-        except PermissionError:
-            print(f" [!] Bo qua {dst_name} (file dang chay boi ung dung)")
-    else:
-        print(f" [!] Khong tim thay: {src}")
+    exe_size_mb = os.path.getsize(OUTPUT_EXE) / (1024 * 1024)
+    print(f"[+] Bien dich thanh cong: {OUTPUT_EXE} ({exe_size_mb:.2f} MB)")
 
-# Copy thu muc mp3
-src_mp3 = os.path.join(BASE_DIR, "mp3")
-dst_mp3 = os.path.join(PACKAGE_DIR, "mp3")
-if os.path.exists(src_mp3):
-    if os.path.exists(dst_mp3):
-        shutil.rmtree(dst_mp3)
-    shutil.copytree(src_mp3, dst_mp3)
-    print(" [+] Da copy thu muc: mp3")
+    # 2. Sao chép file EXE ra thư mục gốc
+    try:
+        shutil.copy2(OUTPUT_EXE, ROOT_EXE)
+        print(f"[+] Da cap nhat file EXE tai thu muc goc: {ROOT_EXE}")
+    except PermissionError:
+        print(f"[!] File {ROOT_EXE} dang duoc su dung boi tien trinh khac.")
 
-# 3. Tao file HUONG_DAN_SU_DUNG.txt
-readme_text = """===================================================================
-      HE THONG DIEM DANH CANTEEN SEAZEN (PORTABLE STANDALONE)
-===================================================================
+    # 3. Tạo tài liệu hướng dẫn vận hành súc tích
+    readme_content = """======================================================================
+         HE THONG DIEM DANH CANTEEN SEAZEN (BAN DOC LAP 1 FILE EXE)
+======================================================================
 
-[1. HUONG DAN SU DUNG CHO MAY MOI / MAY KHAC]:
-1. May tinh nhan KHONG CAN cai dat Python hay bat ky phan mem nao khac.
-2. Chi can giai nen toan bo thu muc nay ra mot o dia (Vi du: C:\\Canteen_Kiosk hoac Desktop).
-3. Nhap dup chuot vao file: SEAZEN_Canteen_Kiosk.exe de khoi chay.
-4. He thong se tu dong bat trinh duyet hien thi man hinh Kiosk toan man hinh (hoac truy cap: http://localhost:5000).
-5. Muon tat he thong: Dong cua so Terminal chay ngam hoac nhan to hop phim Ctrl + C.
+1. CACH SU DUNG:
+- Chi can gui duy nhat tep tin: SEAZEN_Canteen_Kiosk.exe toi may tram.
+- May tinh nhan KHONG CAN cai dat Python, thu vien hay bat ky tep phu tro nao.
+- Nhap dup chuot vao SEAZEN_Canteen_Kiosk.exe de khoi chay he thong.
+- Ung dung tu dong khoi chay may chu noi bo va mo trinh duyet tai:
+  http://localhost:5000
 
-===================================================================
-[2. HUONG DAN DOI TAI KHOAN / LAM MOI TOKEN (KHI CO SU CO TAI KHOAN)]:
-===================================================================
-File 'token_cache.bin' chua ma xac thuc ngam ket noi toi SharePoint Microsoft 365.
-Kiosk se tu dong lam moi token ngam nen ban khong can dang nhap lai hang ngay.
+2. XAC THUC TAI KHOAN MICROSOFT 365 (BAT BUOC):
+- Khi chay lan dau, Kiosk hien thi man hinh yeu cau xac thuc tai khoan Microsoft.
+- Chon "DANG NHAP BANG MICROSOFT 365" de xac thuc tai khoan @seazen.com.vn.
+- Token duoc tu dong ma hoa bang Windows DPAPI va luu tru an tai:
+  %LOCALAPPDATA%\\SeaZen_Canteen_Kiosk\\token_cache.bin
+- He thong tu dong gia han token ngam, khong doi hoi dang nhap lai hang ngay.
 
-KHI NAO BAN CAN THAY DOI TAI KHOAN / CAP NHAT LAI TOKEN?
-- Khi tai khoan ca nhan hien tai doi mat khau.
-- Khi nguoi phu trach cu chuyen cong tac / nghi viec hoac khong muon dung tai khoan ca nhan nua.
-- Khi muon chuyen quyen sang tai khoan chung cua Canteen hoac IT (Service Account).
-- Khi Kiosk bao loi: 'TOKEN_HET_HAN', 'TOKEN_RONG' hoac khong tai duoc danh sach don com.
-
-👉 CAC BUOC THUC HIEN DOI TAI KHOAN (CHI MAT 1 PHUT):
--------------------------------------------------------------------
-Cach 1: Su dung cong cu tu dong "DANG_NHAP_TAI_KHOAN_MOI.bat" (Khuyen dung)
-1. Tat Kiosk dang chay (neu co).
-2. Nhap dup chuot vao file: DANG_NHAP_TAI_KHOAN_MOI.bat
-3. Man hinh se hien ra mot doan ma xac nhan (Vi du: ABCD-EFGH) va tu dong mo trinh duyet vao trang:
-   https://microsoft.com/devicelogin
-4. Nhap ma hien thi tren man hinh -> Nhan "Tiep tuc" (Next).
-5. Dang nhap tai khoan Microsoft 365 moi cua cong ty SeaZen (Tai khoan bat ky co quyen truy cap vao SharePoint ONESEAZEN).
-6. Bam "Tiep tuc" / "Cho phep" de cap quyen.
-7. Cua so dong lenh se bao: "[+] XAC THUC THANH CONG!", va file 'token_cache.bin' moi duoc tu dong sinh ra va ghi de.
-8. Mo lai file "SEAZEN_Canteen_Kiosk.exe" de su dung binh thuong voi tai khoan moi!
-
-Cach 2: Neu may Kiosk khong cai Python (May doc lap cua nha an)
-1. Chay file "DANG_NHAP_TAI_KHOAN_MOI.bat" tren bat ky may tinh nao cua ban hoac IT co san Python.
-2. Thuc hien dang nhap theo cac buoc o Cach 1.
-3. Sau khi thanh cong, copy duy nhat file "token_cache.bin" vua tao ra va dan de vao thu muc Kiosk tren may nha an.
-
-===================================================================
-[3. KHUYEN NGHI DAI HAN VE TAI KHOAN CANTEEN]:
-- De he thong hoat dong on dinh lau dai ma khong phu thuoc vao ca nhan (tranh truong hop nhan vien doi mat khau hoac nghi viec lam gian doan Kiosk), de xuat IT cong ty tao mot tai khoan dich vu rieng:
-  Vi du: canteen.kiosk@seazen.com.vn hoac it.service@seazen.com.vn
-- Cap quyen thanh vien (Member / Edit) cho tai khoan nay vao SharePoint ONESEAZEN (danh sach Canteen_Orders).
-- Dang nhap tai khoan nay vao Kiosk mot lan duy nhat theo Huong dan o Muc 2.
-===================================================================
+3. QUY TAC NHAN DIEN MA NHAN VIEN:
+- Ho tro chuan hoa ma nhan vien dang so: loai bo cac so 0 o dau.
+- Dac quyen VIP Tong Giam Doc DO VAN TOAN:
+  Quet voi bat ky bien the nao: 1, 01, 001, 0001, 00001 deu nhan dien chinh xac
+  la 1 nguoi duy nhat: Tong Giam Doc DO VAN TOAN (Ma NV: 1).
+- Tu dong phat am thanh thong bao va duyet nhan com tuc thi.
+======================================================================
 """
-readme_path = os.path.join(PACKAGE_DIR, "HUONG_DAN_SU_DUNG.txt")
-with open(readme_path, "w", encoding="utf-8") as f:
-    f.write(readme_text)
-print(" [+] Da tao: HUONG_DAN_SU_DUNG.txt")
+    with open(README_FILE, "w", encoding="utf-8") as f:
+        f.write(readme_content)
+    print(f"[+] Da cap nhat: {README_FILE}")
 
-# 4. Nen thanh file ZIP
-if os.path.exists(ZIP_OUTPUT):
-    os.remove(ZIP_OUTPUT)
+    print("=" * 70)
+    print(f"[OK] HOAN TAT: Ban dong goi SEAZEN_Canteen_Kiosk.exe da san sang gui di!")
+    print("=" * 70)
 
-with zipfile.ZipFile(ZIP_OUTPUT, "w", zipfile.ZIP_DEFLATED) as zipf:
-    for root, dirs, files in os.walk(PACKAGE_DIR):
-        for file in files:
-            full_path = os.path.join(root, file)
-            rel_path = os.path.relpath(full_path, PACKAGE_DIR)
-            zipf.write(full_path, rel_path)
-
-zip_size_mb = os.path.getsize(ZIP_OUTPUT) / (1024 * 1024)
-print(f"[OK] DONG GOI HOAN TAT: {ZIP_OUTPUT} ({zip_size_mb:.2f} MB)")
+if __name__ == '__main__':
+    main()

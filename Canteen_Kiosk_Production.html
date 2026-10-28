@@ -3,6 +3,9 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SEAZEN CANTEEN - HỆ THỐNG ĐIỂM DANH SUẤT ĂN</title>
 
@@ -11,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
+  <link rel="icon" type="image/png" href="seazen_logo.png" />
 
   <style>
     /* ===================================================================
@@ -302,6 +306,40 @@
       gap: 14px;
     }
 
+    .brand-logo-img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .brand-logo-img:hover {
+      transform: scale(1.05);
+    }
+
+    .intro-logo-img {
+      height: 95px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+    }
+
+    .login-logo-img {
+      height: 75px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+      margin-bottom: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    .login-logo-img:hover {
+      transform: scale(1.04);
+    }
+
     .brand-pill {
       background: #FFFFFF;
       color: var(--theme-header-bg);
@@ -457,12 +495,12 @@
       letter-spacing: 0.5px;
     }
 
-    /* MAIN SPLIT AREA */
+    /* MAIN DASHBOARD AREA (FULL WIDTH) */
     .main-split-area {
       flex: 1;
       min-height: 0;
-      display: grid;
-      grid-template-columns: 42% 58%;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       background: var(--theme-surface);
     }
@@ -629,6 +667,46 @@
       color: var(--theme-text-muted);
     }
 
+    .scan-format-error-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 10px 18px;
+      background: #FEF2F2;
+      border: 1.5px solid #FCA5A5;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+      animation: shakeAlert 0.35s ease-in-out;
+      max-width: 360px;
+      text-align: left;
+    }
+
+    @keyframes shakeAlert {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .error-badge-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .error-badge-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #DC2626;
+      letter-spacing: 0.3px;
+    }
+
+    .error-badge-desc {
+      font-size: 11px;
+      color: #7F1D1D;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
     /* RIGHT COLUMN: STATS & DUAL LISTS */
     .data-section {
       display: flex;
@@ -641,13 +719,40 @@
 
     /* TOP STATS BAR */
     .stats-bar-minimal {
-      padding: 10px 14px;
+      padding: 10px 16px;
       border-bottom: 1px solid var(--theme-border-subtle);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: #FFFFFF;
       flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-scanner-ready {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803D;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    .dot-laser-pulse {
+      font-size: 10px;
+      color: #16A34A;
+      animation: laserDotGlow 1.5s infinite alternate;
+    }
+
+    @keyframes laserDotGlow {
+      from { opacity: 0.4; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1.2); }
     }
 
     .stat-pill-box {
@@ -804,16 +909,17 @@
       color: var(--theme-text-muted);
     }
 
-    /* FEED ITEM CARD: CLEAN SINGLE-LINE DESIGN */
+    /* FEED ITEM CARD: CLEAN SINGLE-LINE DESIGN (FIX DẤU TIẾNG VIỆT ĐẦY ĐỦ) */
     .feed-item-card {
       background: #FAFAF8;
       border: 1px solid var(--theme-border-subtle);
-      border-radius: 5px;
-      padding: 7px 10px;
+      border-radius: 6px;
+      padding: 10px 14px;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 12px;
       flex-shrink: 0;
       transition: background-color 0.12s ease;
     }
@@ -823,17 +929,17 @@
     }
 
     .feed-item-card.claimed-card {
-      border-left: 3.5px solid #2E7D32;
+      border-left: 4px solid #2E7D32;
     }
 
     .feed-item-card.waiting-card {
-      border-left: 3.5px solid #D97706;
+      border-left: 4px solid #D97706;
     }
 
     .feed-item-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       min-width: 0;
       flex: 1;
     }
@@ -841,21 +947,53 @@
     .feed-item-id {
       background: #FFFFFF;
       border: 1px solid var(--theme-border-subtle);
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
       font-weight: 700;
+      font-family: 'Consolas', monospace;
       color: var(--theme-text-main);
       flex-shrink: 0;
+      letter-spacing: 0.3px;
+    }
+
+    .feed-item-text-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      flex: 1;
     }
 
     .feed-item-name {
-      font-size: 12.5px;
+      font-size: 13.5px;
       font-weight: 700;
       color: var(--theme-text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.45;
+      padding: 1px 0;
+      letter-spacing: 0.1px;
+    }
+
+    .feed-item-note {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      margin-top: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .feed-item-note strong {
+      color: #0F172A;
+      font-weight: 700;
     }
 
     .feed-item-right {
@@ -863,36 +1001,84 @@
     }
 
     .badge-claimed-text {
-      color: #2E7D32;
-      font-size: 11px;
+      color: #15803D;
+      background: #DCFCE7;
+      border: 1px solid #BBF7D0;
+      font-size: 11.5px;
       font-weight: 700;
       white-space: nowrap;
+      padding: 3px 9px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.4;
     }
 
     .badge-waiting-text {
-      color: #D97706;
-      font-size: 11px;
+      color: #B45309;
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      font-size: 11.5px;
       font-weight: 700;
       white-space: nowrap;
+      padding: 3px 9px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.4;
     }
 
     /* ===================================================================
-       RESULT NOTIFICATION CARD (COMPACT, PROFESSIONAL ENTERPRISE DESIGN)
+       SCAN POPUP OVERLAY (CHỈ POPUP KHI ĐƯỢC QUÉT)
        =================================================================== */
+    .scan-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 99998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeInOverlay 0.18s ease-out;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .scan-popup-wrapper {
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      animation: zoomInPopup 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomInPopup {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
     .meal-ticket-card {
       background: #FFFFFF;
-      border: 1.5px solid var(--theme-border-subtle);
-      border-radius: 8px;
-      padding: 16px 18px;
+      border: 2px solid var(--theme-border-subtle);
+      border-radius: 12px;
+      padding: 22px 24px;
       width: 100%;
-      max-width: 390px;
-      margin: 0 auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
       text-align: left;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
 
     .meal-ticket-card.ticket-success {
-      border-color: #2E7D32;
+      border-color: #16A34A;
+    }
+
+    .meal-ticket-card.ticket-before-time {
+      border-color: #EA580C;
     }
 
     .meal-ticket-card.ticket-warning {
@@ -907,26 +1093,30 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #ECEEEA;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .ticket-status-pill {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 5px 12px;
+      border-radius: 6px;
       color: #FFFFFF;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
     }
 
     .ticket-status-pill.success-pill {
-      background: #2E7D32;
+      background: #16A34A;
+    }
+
+    .ticket-status-pill.before-time-pill {
+      background: #EA580C;
     }
 
     .ticket-status-pill.warning-pill {
@@ -937,18 +1127,35 @@
       background: #DC2626;
     }
 
-    .ticket-time-badge {
+    .btn-ticket-close {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 5px;
+      padding: 4px 10px;
       font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-ticket-close:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+    }
+
+    .ticket-time-badge {
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--theme-text-muted);
     }
 
     .ticket-emp-info {
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .ticket-emp-id {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--theme-text-muted);
       letter-spacing: 0.3px;
@@ -956,89 +1163,133 @@
 
     .ticket-emp-id strong {
       color: var(--theme-text-main);
+      font-size: 14px;
     }
 
     .ticket-emp-name {
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 900;
       color: var(--theme-text-main);
       text-transform: uppercase;
-      margin: 2px 0 1px;
+      margin: 4px 0 2px;
+      line-height: 1.35;
+      padding: 3px 0 2px;
     }
 
     .ticket-emp-role {
-      font-size: 11.5px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--theme-text-muted);
     }
 
     .ticket-qty-warn {
-      background: #FEE2E2;
-      border: 1px solid #EF4444;
+      background: #FEF2F2;
+      border: 1.5px solid #EF4444;
       color: #991B1B;
-      font-size: 11.5px;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 14px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 14px;
+      animation: pulseAlert 1.2s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      from { transform: scale(1); }
+      to { transform: scale(1.02); }
     }
 
     .ticket-meal-pill {
       background: #F0FDF4;
       border: 1px solid #BBF7D0;
       color: #166534;
-      padding: 6px 10px;
-      border-radius: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .ticket-alert-box {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .ticket-alert-box strong {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .ticket-alert-box p {
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .ticket-alert-box.before-time-alert {
+      background: #FFF7ED;
+      border: 1.5px solid #F97316;
+      color: #9A3412;
+    }
+
+    .ticket-alert-box.warning-alert {
+      background: #FEF3C7;
+      border: 1.5px solid #F59E0B;
+      color: #92400E;
+    }
+
+    .ticket-alert-box.error-alert {
+      background: #FEE2E2;
+      border: 1.5px solid #EF4444;
+      color: #991B1B;
     }
 
     .ticket-footer-msg {
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 7px 10px;
-      border-radius: 5px;
+      padding: 9px 12px;
+      border-radius: 6px;
       text-align: center;
       background: #F0FDF4;
       color: #166534;
       border: 1px dashed #86EFAC;
     }
 
-    .ticket-alert-box {
-      padding: 8px 10px;
-      border-radius: 5px;
-      font-size: 11.5px;
+    .ticket-footer-msg.msg-warning {
+      background: #FFFBEB;
+      color: #B45309;
+      border-color: #FCD34D;
     }
 
-    .ticket-alert-box strong {
-      display: block;
-      font-weight: 800;
-      margin-bottom: 2px;
+    .ticket-footer-msg.msg-error {
+      background: #FEF2F2;
+      color: #B91C1C;
+      border-color: #FCA5A5;
     }
 
-    .ticket-alert-box p {
-      font-weight: 500;
-      margin: 0;
-      line-height: 1.3;
+    .ticket-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: var(--theme-primary);
+      width: 100%;
+      animation: ticketCountdown 4.5s linear forwards;
     }
 
-    .ticket-alert-box.warning-alert {
-      background: #FEF3C7;
-      border: 1px solid #F59E0B;
-      color: #92400E;
-    }
-
-    .ticket-alert-box.error-alert {
-      background: #FEE2E2;
-      border: 1px solid #EF4444;
-      color: #991B1B;
+    @keyframes ticketCountdown {
+      from { width: 100%; }
+      to { width: 0%; }
     }
 
     /* ===================================================================
@@ -1276,6 +1527,29 @@
       font-weight: 500;
     }
 
+    .btn-cooldown-quick {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 5px;
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-cooldown-quick:hover {
+      background: #F1F5F9;
+      border-color: #94A3B8;
+    }
+
+    .btn-cooldown-quick.active {
+      background: #0F172A;
+      color: #FFFFFF;
+      border-color: #0F172A;
+    }
+
     /* MODAL 2: ORDERS DETAILS TABLE & TOOLBAR */
     .modal-toolbar-row {
       display: flex;
@@ -1472,9 +1746,10 @@
     }
 
     .modal-orders-table tbody td {
-      padding: 9px 14px;
+      padding: 11px 14px;
       color: #1E293B;
       vertical-align: middle;
+      line-height: 1.5;
     }
 
     .col-stt {
@@ -1494,8 +1769,11 @@
     }
 
     .col-fullname {
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 13.5px;
       color: #0F172A;
+      line-height: 1.5;
+      padding: 2px 0;
     }
 
     .col-status {
@@ -1516,6 +1794,41 @@
       color: #94A3B8;
       font-weight: 400;
       font-family: inherit;
+    }
+
+    .col-note {
+      color: #475569;
+      font-size: 12.5px;
+      font-weight: 500;
+      max-width: 280px;
+      line-height: 1.4;
+    }
+
+    .col-note .note-pill {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #334155;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ticket-emp-note {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #B45309;
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .table-status-badge {
@@ -1542,6 +1855,77 @@
       border: 1px solid #FDE68A;
     }
 
+    /* ===================================================================
+       MODAL 2: FULLSCREEN FIXED BOUNDS (CHI TIẾT CỐ ĐỊNH FULL GIỚI HẠN)
+       =================================================================== */
+    #list-modal {
+      padding: 12px !important;
+    }
+
+    #list-modal .list-modal-box {
+      width: calc(100vw - 24px) !important;
+      height: calc(100vh - 24px) !important;
+      max-width: none !important;
+      max-height: none !important;
+      border-radius: 12px !important;
+      margin: 0 !important;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+
+    #list-modal .list-modal-header {
+      flex-shrink: 0;
+      padding: 14px 22px;
+      background: #F8FAFC;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    #list-modal .list-modal-body {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      padding: 16px 22px 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #list-modal .modal-toolbar-row {
+      flex-shrink: 0;
+      margin-bottom: 12px;
+    }
+
+    #list-modal .modal-orders-wrapper {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    #list-modal .modal-table-scroll {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      max-height: none !important;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    #list-modal .modal-orders-table thead th {
+      position: sticky;
+      top: 0;
+      background: #F1F5F9;
+      z-index: 10;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
     #scanner-hidden-input {
       position: absolute;
       opacity: 0;
@@ -1550,13 +1934,13 @@
     }
 
     /* ===================================================================
-       LOGIN OVERLAY & AUTH BADGE (RETRO & ENTERPRISE)
+       MICROSOFT 365 ENTERPRISE AUTHENTICATION OVERLAY
        =================================================================== */
     .login-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
       z-index: 999999;
       display: flex;
       align-items: center;
@@ -1566,21 +1950,14 @@
     }
 
     @keyframes fadeInAuth {
-      from {
-        opacity: 0;
-        transform: scale(0.98);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .login-card {
       background: #FFFFFF;
       border: 1px solid #CBD5E1;
-      border-radius: 14px;
+      border-radius: 12px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
       width: 100%;
       max-width: 440px;
@@ -1591,43 +1968,125 @@
 
     .login-badge-brand {
       display: inline-block;
-      background: linear-gradient(135deg, #8B1E24, #A52A2A);
+      background: #0F172A;
       color: #FFFFFF;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 1.5px;
       padding: 4px 12px;
-      border-radius: 20px;
+      border-radius: 4px;
       margin-bottom: 12px;
     }
 
     .login-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: #0F172A;
       margin: 0 0 6px 0;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .login-subtitle {
       font-size: 13.5px;
-      color: #64748B;
-      margin: 0 0 16px 0;
-    }
-
-    .login-role-notice {
-      background: #FEF3C7;
-      border-left: 4px solid #D97706;
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 12px;
-      color: #92400E;
-      margin-bottom: 20px;
+      color: #475569;
+      margin: 0 0 18px 0;
       line-height: 1.4;
     }
 
+    .btn-ms-login {
+      width: 100%;
+      padding: 13px 18px;
+      background: #0F172A;
+      color: #FFFFFF;
+      border: 1px solid #0F172A;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      margin-bottom: 14px;
+    }
+
+    .btn-ms-login:hover:not(:disabled) {
+      background: #1E293B;
+      border-color: #1E293B;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    }
+
+    .btn-ms-login:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .auth-tabs-nav {
+      display: flex;
+      border-bottom: 1px solid #E2E8F0;
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+
+    .auth-tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748B;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .auth-tab-btn.active {
+      color: #0F172A;
+      border-bottom-color: #0F172A;
+      font-weight: 700;
+    }
+
+    .device-code-box {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .device-code-val {
+      font-family: Consolas, monospace;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #1E3A8A;
+      background: #EFF6FF;
+      border: 1px dashed #93C5FD;
+      border-radius: 6px;
+      padding: 10px;
+      margin: 10px 0;
+      user-select: all;
+    }
+
+    .device-code-step {
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .device-code-step a {
+      color: #2563EB;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
     .login-field-group {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .login-field-group label {
@@ -1644,16 +2103,9 @@
       align-items: center;
     }
 
-    .login-input-icon {
-      position: absolute;
-      left: 12px;
-      color: #94A3B8;
-      pointer-events: none;
-    }
-
     .login-input {
       width: 100%;
-      padding: 11px 40px 11px 38px;
+      padding: 11px 14px;
       font-size: 14px;
       border: 1.5px solid #CBD5E1;
       border-radius: 8px;
@@ -1666,51 +2118,9 @@
     }
 
     .login-input:focus {
-      border-color: #8B1E24;
+      border-color: #0F172A;
       background: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(139, 30, 36, 0.15);
-    }
-
-    .btn-toggle-pwd {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px 6px;
-      color: #64748B;
-    }
-
-    .btn-login-submit {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #8B1E24, #B22222);
-      color: #FFFFFF;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(139, 30, 36, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .btn-login-submit:hover:not(:disabled) {
-      background: linear-gradient(135deg, #70151A, #8B1E24);
-      box-shadow: 0 6px 16px rgba(139, 30, 36, 0.4);
-      transform: translateY(-1px);
-    }
-
-    .btn-login-submit:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
     }
 
     .login-alert {
@@ -1748,20 +2158,14 @@
       animation: spin 0.6s linear infinite;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
     /* AUTH USER BADGE IN HEADER */
     .auth-user-badge {
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       gap: 8px;
     }
 
@@ -1770,83 +2174,107 @@
       font-weight: 700;
       color: #FFFFFF;
       white-space: nowrap;
-      max-width: 140px;
+      max-width: 180px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .btn-logout {
-      background: rgba(255, 255, 255, 0.9);
-      color: #8B1E24;
+      background: #FFFFFF;
+      color: #0F172A;
       border: none;
       border-radius: 4px;
-      padding: 3px 8px;
+      padding: 4px 8px;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
     .btn-logout:hover {
-      background: #FFFFFF;
-      transform: scale(1.05);
+      background: #F1F5F9;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- LOGIN OVERLAY (XÁC THỰC QUYỀN SHAREPOINT USERLOGIN) -->
-  <div id="login-overlay" class="login-overlay">
+  <!-- LOGIN OVERLAY (XÁC THỰC BẮT BUỘC MICROSOFT 365) -->
+  <div id="login-overlay" class="login-overlay" style="display: none;">
     <div class="login-card">
-      <div class="login-badge-brand">SEAZEN GROUP</div>
-      <h2 class="login-title">ĐĂNG NHẬP HỆ THỐNG</h2>
-      <p class="login-subtitle">Xác thực quyền quản trị Canteen Seazen</p>
-
-      <div class="login-role-notice">
-        <strong>🔒 Yêu cầu quyền hạn: Liên hệ Admin IT nếu cần</strong>
+      <div style="text-align: center; margin-bottom: 12px;">
+        <img src="seazen_logo.png" alt="SeaZen Logo" class="login-logo-img" />
       </div>
+      <div class="login-badge-brand">SEAZEN CANTEEN KIOSK</div>
+      <h2 class="login-title">XÁC THỰC MICROSOFT 365</h2>
+      <p class="login-subtitle">Đăng nhập tài khoản Microsoft 365 (@seazen.com.vn) để kích hoạt hệ thống điểm danh nhà ăn.</p>
 
       <div id="login-alert" class="login-alert alert-error" style="display: none;"></div>
 
-      <form id="login-form" onsubmit="handleLoginSubmit(event)">
-        <div class="login-field-group">
-          <label for="login-username">Tên đăng nhập (UserName)</label>
-          <div class="login-input-wrap">
-            <svg class="login-input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <input type="text" id="login-username" class="login-input" placeholder="Nhập UserName..." required
-              autocomplete="username" />
-          </div>
-        </div>
+      <div class="auth-tabs-nav">
+        <button type="button" id="tab-btn-browser" class="auth-tab-btn active" onclick="switchAuthTab('browser')">Trình duyệt (OAuth2)</button>
+        <button type="button" id="tab-btn-device" class="auth-tab-btn" onclick="switchAuthTab('device')">Mã thiết bị</button>
+        <button type="button" id="tab-btn-form" class="auth-tab-btn" onclick="switchAuthTab('form')">Email & Mật khẩu</button>
+      </div>
 
-        <div class="login-field-group">
-          <label for="login-password">Mật khẩu (Password)</label>
-          <div class="login-input-wrap">
-            <svg class="login-input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <input type="password" id="login-password" class="login-input" placeholder="Nhập password..." required
-              autocomplete="current-password" />
-            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility()" title="Hiện/ẩn mật khẩu">
-              <span id="pwd-toggle-icon">👁</span>
-            </button>
-          </div>
-        </div>
-
-        <button type="submit" id="btn-login-submit" class="btn-login-submit">
-          <span id="login-text">ĐĂNG NHẬP</span>
-          <span id="login-spinner" class="login-spinner" style="display: none;"></span>
+      <!-- TAB 1: BROWSER LOGIN (KHUYÊN DÙNG) -->
+      <div id="auth-panel-browser">
+        <button type="button" id="btn-ms-interactive" class="btn-ms-login" onclick="triggerMsInteractiveLogin()">
+          <svg width="20" height="20" viewBox="0 0 21 21">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+          </svg>
+          <span id="ms-login-text">ĐĂNG NHẬP BẰNG MICROSOFT 365</span>
+          <span id="ms-login-spinner" class="login-spinner" style="display: none;"></span>
         </button>
-      </form>
+        <div style="font-size: 12px; color: #64748B; line-height: 1.5; text-align: center; margin-top: 6px;">
+          Nhấp nút trên để đăng nhập tài khoản SeaZen. Token sẽ được lưu ẩn và mã hóa trong AppData máy này.
+        </div>
+      </div>
+
+      <!-- TAB 2: DEVICE CODE LOGIN -->
+      <div id="auth-panel-device" style="display: none;">
+        <div class="device-code-box">
+          <div class="device-code-step">
+            1. Mở trình duyệt truy cập: <a href="https://microsoft.com/devicelogin" target="_blank" id="device-flow-link">microsoft.com/devicelogin</a>
+            <br>2. Nhập mã bên dưới và đăng nhập tài khoản SeaZen:
+          </div>
+          <div class="device-code-val" id="device-flow-code">KHỞI TẠO...</div>
+          <div class="device-code-step" id="device-flow-status" style="color: #64748B;">
+            Đang chờ khởi tạo...
+          </div>
+        </div>
+        <button type="button" class="btn-ms-login" style="margin-top: 8px; background: #334155;" onclick="startMsDeviceCodeFlow()">
+          LÀM MỚI MÃ THIẾT BỊ
+        </button>
+      </div>
+
+      <!-- TAB 3: CREDENTIALS FORM -->
+      <div id="auth-panel-form" style="display: none;">
+        <form id="ms-creds-form" onsubmit="handleMsCredsSubmit(event)">
+          <div class="login-field-group">
+            <label for="ms-username">Email Microsoft 365</label>
+            <div class="login-input-wrap">
+              <input type="email" id="ms-username" class="login-input" placeholder="ten.nv@seazen.com.vn" required />
+            </div>
+          </div>
+          <div class="login-field-group">
+            <label for="ms-password">Mật khẩu</label>
+            <div class="login-input-wrap">
+              <input type="password" id="ms-password" class="login-input" placeholder="Nhập mật khẩu..." required />
+            </div>
+          </div>
+          <button type="submit" id="btn-ms-creds-submit" class="btn-ms-login" style="margin-top: 10px;">
+            <span id="creds-submit-text">XÁC THỰC TÀI KHOẢN</span>
+            <span id="creds-spinner" class="login-spinner" style="display: none;"></span>
+          </button>
+        </form>
+      </div>
 
       <div class="login-footer">
-        CANTEEN KIOSK ACCESS CONTROL &copy; SEAZEN
+        HỆ THỐNG ĐIỂM DANH CANTEEN &copy; TẬP ĐOÀN SEAZEN
       </div>
     </div>
   </div>
@@ -1854,7 +2282,7 @@
   <!-- INTRO OVERLAY (TỐI GIẢN, TỰ BIẾN MẤT HOẶC BẤM ĐỂ BỎ QUA) -->
   <div id="intro-overlay" class="intro-overlay" onclick="dismissIntro()">
     <div class="intro-box">
-      <div class="intro-badge-seazen">SEAZEN</div>
+      <img src="seazen_logo.png" alt="SeaZen Technology Logo" class="intro-logo-img" />
       <div class="intro-canteen-title">CANTEEN</div>
       <div class="intro-subtitle">HỆ THỐNG TỰ ĐỘNG SEAZEN</div>
       <div class="intro-progress-bar">
@@ -1871,7 +2299,7 @@
     <!-- 1. HEADER BAR -->
     <header class="header-bar">
       <div class="header-left">
-        <div class="brand-pill">SEAZEN</div>
+        <img src="seazen_logo.png" alt="SeaZen Technology Logo" class="brand-logo-img" />
         <div class="brand-titles">
           <div class="brand-main">CANTEEN</div>
           <div class="brand-sub">COM TRUA VAN PHONG</div>
@@ -1890,9 +2318,14 @@
         </div>
         <div class="header-btns">
           <!-- <div id="auth-user-badge" class="auth-user-badge" style="display: none;"> -->
-          <span class="auth-user-name" id="auth-user-name" title="Tài khoản đăng nhập">Admin</span>
-          <button type="button" class="btn-palette" onclick="handleLogout()" title="Đăng xuất khỏi hệ thống">ĐĂNG
-            XUẤT</button>
+          <div id="auth-user-badge" class="auth-user-badge" style="display: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="auth-user-name" id="auth-user-name" title="Tài khoản Microsoft 365">Admin</span>
+            <button type="button" class="btn-logout" onclick="handleMsLogout()" title="Đăng xuất khỏi Kiosk">ĐĂNG XUẤT</button>
+          </div>
           <!-- </div> -->
           <button type="button" class="btn-palette" onclick="toggleThemeModal(true)"
             title="Chọn màu sắc & cài đặt giọng đọc">
@@ -1909,61 +2342,19 @@
     <div class="sub-banner-strip">
       <div class="sub-left">
         <span class="dot-live">●</span>
-        <span>KHUNG GIỜ PHỤC VỤ: 12:00 - 13:00</span>
+        <span>KHUNG GIỜ PHỤC VỤ: 11:30 - 13:00</span>
       </div>
       <div class="sub-right">
         QUÉT MÃ QR TRÊN THẺ NHÂN VIÊN || DÙNG MÃ QR ĐƯỢC CUNG CẤP TRÊN APP SEAZENHR
       </div>
     </div>
 
-    <!-- 3. MAIN SPLIT AREA -->
+    <!-- 3. MAIN DASHBOARD AREA (FULL WIDTH BỐ CỤC GỌN GÀNG HỢP LÝ) -->
     <main class="main-split-area">
 
-      <!-- CỘT 1: VÙNG QUÉT MÃ (LEFT - 42%) -->
-      <section class="scanner-section">
-
-        <!-- TRẠNG THÁI CHỜ QUÉT (IDLE) -->
-        <div id="view-idle" class="view-idle-box">
-          <div class="minimal-viewfinder">
-            <div class="corner tl"></div>
-            <div class="corner tr"></div>
-            <div class="corner bl"></div>
-            <div class="corner br"></div>
-            <div class="laser-beam"></div>
-
-            <div class="vf-frame-dashed">
-              <div class="vf-inner">
-                <div class="vf-card-icon">
-                  <!-- Clean ID Card SVG Icon -->
-                  <svg width="52" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                    <line x1="7" y1="9" x2="11" y2="9"></line>
-                    <line x1="7" y1="13" x2="17" y2="13"></line>
-                    <line x1="7" y1="17" x2="13" y2="17"></line>
-                    <circle cx="15.5" cy="9" r="1.5"></circle>
-                  </svg>
-                </div>
-                <div class="vf-divider-line">
-                  <span>MÁY QUÉT 2D ĐANG CHỜ TÍN HIỆU</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h2 class="scanner-status-title">ĐẦU ĐỌC ĐANG HOẠT ĐỘNG</h2>
-          <p class="scanner-status-sub">Lướt mã thẻ qua mặt kính để ghi nhận suất ăn</p>
-        </div>
-
-        <!-- TRẠNG THÁI KẾT QUẢ QUÉT (RESULT POPUP GỌN GÀNG) -->
-        <div id="view-result" style="display: none; width: 100%; max-width: 390px;"></div>
-
-      </section>
-
-      <!-- CỘT 2: BẢNG THỐNG KÊ & 2 DANH SÁCH SONG SONG (RIGHT - 58%) -->
       <aside class="data-section">
 
-        <!-- THANH THỐNG KÊ TỐI GIẢN -->
+        <!-- THANH THỐNG KÊ TỔNG QUAN & TRẠNG THÁI ĐẦU ĐỌC 2D -->
         <div class="stats-bar-minimal">
           <div class="stat-pill-box" title="Tổng số suất ăn đã đăng ký hôm nay">
             <span class="pill-label">TỔNG ĐĂNG KÝ:</span>
@@ -1976,6 +2367,11 @@
           <div class="stat-pill-box" title="Số nhân viên chưa đến nhận cơm">
             <span class="pill-label">CHƯA NHẬN:</span>
             <strong class="pill-val val-waiting" id="stat-remaining">0</strong>
+          </div>
+
+          <div class="stat-scanner-ready" id="scanner-ready-badge" title="Đầu đọc mã vạch / QR 2D đang hoạt động ở chế độ chờ">
+            <span class="dot-laser-pulse">●</span>
+            <span>MÁY QUÉT 2D SẴN SÀNG</span>
           </div>
 
           <button type="button" class="btn-action-pill" onclick="refreshTodayOrders(true)"
@@ -2032,6 +2428,15 @@
 
     </main>
 
+  </div>
+
+  <!-- ===================================================================
+       MODAL 0: POPUP OVERLAY KẾT QUẢ QUÉT (CHỈ POPUP KHI ĐƯỢC QUÉT)
+       =================================================================== -->
+  <div id="scan-popup-overlay" class="scan-popup-overlay" style="display: none;" onclick="closeScanPopup()">
+    <div class="scan-popup-wrapper" onclick="event.stopPropagation()">
+      <div id="view-result"></div>
+    </div>
   </div>
 
   <!-- ===================================================================
@@ -2152,6 +2557,44 @@
           </div>
         </div>
 
+        <!-- CÀI ĐẶT ĐỘ NHẠY & THỜI GIAN GIÃN CÁCH QUÉT TRÙNG MÃ (SCAN COOLDOWN) -->
+        <div class="voice-setting-box" style="margin-top: 14px;">
+          <div class="voice-setting-header">
+            <div>
+              <div class="voice-setting-title">
+                ⏱️ ĐỘ NHẠY & GIÃN CÁCH QUÉT TRÙNG MÃ (SCAN COOLDOWN)
+              </div>
+              <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">
+                Khoảng thời gian tối thiểu giữa 2 lần quét cùng một mã (tránh quét lặp lại liên tục).
+              </div>
+            </div>
+            <span id="cooldown-status-badge" style="font-size: 11px; font-weight: 700; color: #15803D; background: #DCFCE7; padding: 3px 8px; border-radius: 4px; display: none;">
+              ✓ Đã lưu
+            </span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <input type="number" id="input-scan-cooldown" min="0" max="3600" step="1" value="5"
+                style="width: 80px; padding: 6px 10px; font-size: 14px; font-weight: 700; border: 1.5px solid #CBD5E1; border-radius: 6px; text-align: center; color: #0F172A;"
+                oninput="handleScanCooldownInput(this.value)" />
+              <span style="font-weight: 700; font-size: 13px; color: #334155;">giây (s)</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-3" onclick="setQuickCooldown(3)">3s</button>
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-5" onclick="setQuickCooldown(5)">5s</button>
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-10" onclick="setQuickCooldown(10)">10s</button>
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-30" onclick="setQuickCooldown(30)">30s</button>
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-60" onclick="setQuickCooldown(60)">1 phút</button>
+              <button type="button" class="btn-cooldown-quick" id="btn-cd-300" onclick="setQuickCooldown(300)">5 phút</button>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: #64748B; margin-top: 8px;">
+            💡 Ví dụ: Nhập <strong>5</strong> (hoặc bấm nút <strong>5s</strong>) thì cách 5 giây sau hệ thống mới nhận lại mã vừa quét. (Nhập <strong>0</strong> để tắt giãn cách).
+          </div>
+        </div>
+
         <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between;">
           <span style="font-size: 11.5px; color: #64748B;">
             💡 Quét mã barcode <code>THEME</code> hoặc bấm <code>BẢNG MÀU</code> để mở menu này bất cứ lúc nào.
@@ -2228,11 +2671,12 @@
                   <th class="col-fullname">HỌ VÀ TÊN</th>
                   <th class="col-status">TRẠNG THÁI</th>
                   <th class="col-time">GIỜ NHẬN</th>
+                  <th class="col-note">GHI CHÚ</th>
                 </tr>
               </thead>
               <tbody id="modal-orders-tbody">
                 <tr>
-                  <td colspan="5"
+                  <td colspan="6"
                     style="text-align: center; color: var(--theme-text-muted); padding: 30px; font-weight: 600;">
                     Đang tải danh sách...
                   </td>
@@ -2296,6 +2740,7 @@
       if (isThemeModalOpen) {
         const current = document.documentElement.getAttribute('data-theme') || 'vert-sauge';
         applyTheme(current, false);
+        updateCooldownUI();
       }
       focusScanner();
     }
@@ -2507,7 +2952,7 @@
     }
 
     // Phát kết hợp âm thanh báo (success.mp3 / error.mp3) và giọng đọc tương ứng (Nam MP3 / Nữ Google)
-    function playKioskFeedback(scenario) {
+    function playKioskFeedback(scenario, isVIP = false) {
       stopAllAudio();
 
       if (scenario === 'SUCCESS') {
@@ -2516,12 +2961,23 @@
 
         // 2. Giọng đọc phát sau 320ms để hòa quyện với tiếng chuông
         voiceSequenceTimer = setTimeout(() => {
-          if (currentVoiceGender === 'male') {
+          if (isVIP) {
+            speakVietnamese("Kính mời Tổng Giám Đốc nhận cơm, chúc anh ngon miệng!");
+          } else if (currentVoiceGender === 'male') {
             currentPlayingAudio = playMp3Sound('male_success');
           } else {
-            speakVietnamese("Mời nhận món, chúc bạn ngon miệng!");
+            speakVietnamese("Mời nhận cơm, chúc bạn ngon miệng!");
           }
         }, 320);
+
+      } else if (scenario === 'BEFORE_TIME') {
+        // 1. Âm thanh cảnh báo chưa đến giờ nhận cơm
+        playMp3Sound('error');
+
+        // 2. Giọng đọc thông báo rõ ràng
+        voiceSequenceTimer = setTimeout(() => {
+          speakVietnamese("Chưa đến giờ nhận cơm trưa, vui lòng quay lại sau mười một giờ ba mươi.");
+        }, 400);
 
       } else if (scenario === 'ALREADY_CLAIMED') {
         // 1. Âm thanh cảnh báo thất bại loại 1: error.mp3
@@ -2532,7 +2988,7 @@
           if (currentVoiceGender === 'male') {
             currentPlayingAudio = playMp3Sound('male_already_claimed');
           } else {
-            speakVietnamese("Mã thẻ này đã nhận phần ăn trước đó.");
+            speakVietnamese("Mã thẻ này đã nhận cơm trước đó.");
           }
         }, 400);
 
@@ -2556,7 +3012,7 @@
       if (currentVoiceGender === 'male') {
         currentPlayingAudio = playMp3Sound('male_success');
       } else {
-        speakVietnamese("Mời nhận món, chúc bạn ngon miệng!");
+        speakVietnamese("Mời nhận cơm, chúc bạn ngon miệng!");
       }
     }
 
@@ -2588,7 +3044,20 @@
         const data = await res.json();
         const spBadge = document.getElementById('sp-status');
 
+        if (data.status === "REQUIRE_MS_LOGIN" || data.authenticated === false) {
+          isMsAuthenticated = false;
+          showLoginOverlay(true);
+          if (spBadge) {
+            spBadge.innerText = "● MICROSOFT 365: YÊU CẦU ĐĂNG NHẬP";
+            spBadge.style.color = "#FCA5A5";
+          }
+          return;
+        }
+
         if (data.status === "SUCCESS") {
+          isMsAuthenticated = true;
+          showLoginOverlay(false);
+          updateAuthBadge({ username: data.account, fullName: data.userName || data.account });
           cachedOrders = data.orders || {};
           cachedAllOrders = data.allOrders || [];
           updateStats(data.orders || {});
@@ -2655,7 +3124,8 @@
             name: o.fullName,
             empId: o.empId,
             meal: `${o.quantity || 1} ${o.mealType || 'Món mặn'}`,
-            time: o.claimedAt || "11:30"
+            time: o.claimedAt || "11:30",
+            note: o.note || ""
           }));
       }
 
@@ -2671,13 +3141,17 @@
           claimedItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'feed-item-card claimed-card';
+            const noteHtml = item.note ? `<div class="feed-item-note" title="${escapeHtml(item.note)}">📝 ${escapeHtml(item.note)}</div>` : '';
             card.innerHTML = `
               <div class="feed-item-left">
-                <span class="feed-item-id">${item.empId}</span>
-                <span class="feed-item-name" title="${item.name || ''}">${item.name || 'Nhân viên'}</span>
+                <span class="feed-item-id">${escapeHtml(item.empId)}</span>
+                <div class="feed-item-text-box">
+                  <span class="feed-item-name" title="${escapeHtml(item.name || item.fullName || '')}">${escapeHtml(item.name || item.fullName || 'Nhân viên')}</span>
+                  ${noteHtml}
+                </div>
               </div>
               <div class="feed-item-right">
-                <span class="badge-claimed-text">✓ ĐÃ NHẬN: ${item.time || ''}</span>
+                <span class="badge-claimed-text">✓ ĐÃ NHẬN: ${escapeHtml(item.time || '')}</span>
               </div>
             `;
             containerClaimed.appendChild(card);
@@ -2703,10 +3177,14 @@
           waitingItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'feed-item-card waiting-card';
+            const noteHtml = item.note ? `<div class="feed-item-note" title="${escapeHtml(item.note)}">📝 ${escapeHtml(item.note)}</div>` : '';
             card.innerHTML = `
               <div class="feed-item-left">
-                <span class="feed-item-id">${item.empId}</span>
-                <span class="feed-item-name" title="${item.fullName || ''}">${item.fullName || 'Nhân viên'}</span>
+                <span class="feed-item-id">${escapeHtml(item.empId)}</span>
+                <div class="feed-item-text-box">
+                  <span class="feed-item-name" title="${escapeHtml(item.fullName || '')}">${escapeHtml(item.fullName || 'Nhân viên')}</span>
+                  ${noteHtml}
+                </div>
               </div>
               <div class="feed-item-right">
                 <span class="badge-waiting-text">✘ CHƯA NHẬN</span>
@@ -2719,37 +3197,40 @@
     }
 
     // CHECK-IN PROCESSING
+    // Mã nhân viên là trường đầu tiên của thẻ, hoặc toàn bộ chuỗi nếu chỉ quét số.
+    function normalizeEmpId(raw) {
+      if (!raw) return '';
+      let s = String(raw).trim();
+      if (s.includes('|')) {
+        s = s.split('|')[0].trim();
+      }
+      if (/^\d+$/.test(s)) {
+        return String(parseInt(s, 10));
+      }
+      return s;
+    }
+
+    // Chuẩn hóa mã nhân viên từ quét thẻ: chấp nhận chuỗi số từ 1 đến 10 chữ số (1, 01, 001, 0001, 00001, v.v.)
+    function extractEmpIdFromScan(raw) {
+      if (!raw) return '';
+      const s = String(raw).trim();
+      if (!s) return '';
+      const id = s.split('|', 1)[0].trim();
+      return /^\d{1,10}$/.test(id) ? id : '';
+    }
+
     function parseBadgeScanString(raw) {
       let clean = (raw || '').trim();
       if (!clean) return { empId: '', rawName: '', rawRole: '' };
 
-      let empId = clean;
+      let empId = extractEmpIdFromScan(clean);
       let rawName = "";
       let rawRole = "";
 
       if (clean.includes('|')) {
         const parts = clean.split('|');
-        empId = (parts[0] || '').trim();
         rawName = (parts[1] || '').trim();
         rawRole = (parts[2] || '').trim();
-      }
-
-      if (cachedOrders && typeof cachedOrders === 'object') {
-        if (!cachedOrders[empId]) {
-          for (const validId of Object.keys(cachedOrders)) {
-            if (empId === validId || empId.endsWith(validId) || empId.includes(validId)) {
-              empId = validId;
-              break;
-            }
-          }
-        }
-      }
-
-      const numMatch = empId.match(/[a-zA-Z]+(\d{2,})$/);
-      if (numMatch && numMatch[1]) {
-        if (!cachedOrders || !cachedOrders[empId] && cachedOrders[numMatch[1]]) {
-          empId = numMatch[1];
-        }
       }
 
       return { empId, rawName, rawRole };
@@ -2758,51 +3239,275 @@
     function isListTrigger(raw) {
       if (!raw) return false;
       const s = String(raw).trim().toUpperCase();
-      return s.includes("LIST") || s.includes("DANHSACH");
+      return s === "LIST" || s === "DANHSACH" || s.includes("LIST") || s.includes("DANHSACH");
     }
 
     function isThemeTrigger(raw) {
       if (!raw) return false;
       const s = String(raw).trim().toUpperCase();
-      return s.includes("THEME") || s.includes("COLOR") || s.includes("MAU");
+      return s === "THEME" || s === "COLOR" || s === "MAU" || s.includes("THEME") || s.includes("COLOR");
     }
 
-    async function processCheckIn(rawString) {
+    function isProhibitedScanPrefix(str) {
+      if (!str) return false;
+      const lower = String(str).trim().toLowerCase();
+      return lower.startsWith('http://') || lower.startsWith('https://') ||
+             lower.startsWith('www.') || lower.startsWith('ftp://') ||
+             lower.startsWith('zalo://') || lower.startsWith('momo://') ||
+             lower.startsWith('wifi:') || lower.startsWith('tel:') ||
+             lower.startsWith('mailto:') || lower.startsWith('000201');
+    }
+
+    function isValidScanFormat(raw) {
+      if (!raw) return false;
+      const s = String(raw).trim();
+
+      // Lệnh điều khiển Kiosk hợp lệ (THEME, LIST,...)
+      if (isThemeTrigger(s) || isListTrigger(s)) return true;
+
+      return extractEmpIdFromScan(s) !== '';
+    }
+
+    let isScanPopupOpen = false;
+    let popupCloseAtTimestamp = 0;
+
+    function openScanPopup(htmlContent, duration = 4500) {
       clearTimeout(idleTimer);
+      const overlay = document.getElementById('scan-popup-overlay');
+      const viewResult = document.getElementById('view-result');
+      if (!overlay || !viewResult) return;
+
+      viewResult.innerHTML = htmlContent;
+      overlay.style.display = 'flex';
+      isScanPopupOpen = true;
+      popupCloseAtTimestamp = Date.now() + duration;
+
+      idleTimer = setTimeout(() => {
+        closeScanPopup();
+      }, duration);
+    }
+
+    function closeScanPopup() {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+      popupCloseAtTimestamp = 0;
+      const overlay = document.getElementById('scan-popup-overlay');
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+      isScanPopupOpen = false;
+      clearScannerBuffers();
+      focusScanner();
+    }
+
+    // Fail-safe auto-close watcher: Quét liên tục cũng đảm bảo popup luôn tự đóng đúng hạn
+    setInterval(() => {
+      if (isScanPopupOpen && popupCloseAtTimestamp > 0 && Date.now() >= popupCloseAtTimestamp) {
+        closeScanPopup();
+      }
+    }, 400);
+
+    let scanFormatErrorTimer = null;
+    function showScanFormatErrorBadge(invalidCode) {
+      soundWarning();
+      openScanPopup(`
+        <div class="meal-ticket-card ticket-error">
+          <div class="ticket-top-bar">
+            <span class="ticket-status-pill error-pill">⚠️ MÃ QUÉT SAI ĐỊNH DẠNG</span>
+            <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
+          </div>
+          <div class="ticket-alert-box error-alert">
+            <strong>HỆ THỐNG ĐÃ TỰ ĐỘNG TỪ CHỐI MÃ NÀY!</strong>
+            <p>Mã vừa quét không đúng định dạng thẻ nhân viên hoặc mã suất ăn SeazenHR.</p>
+          </div>
+          <div class="ticket-footer-msg msg-error">
+            MÃ TỪ CHỐI: ${escapeHtml(invalidCode ? invalidCode.slice(0, 32) : '')}
+          </div>
+          <div class="ticket-progress-bar"></div>
+        </div>
+      `, 3000);
+    }
+
+    // ===================================================================
+    // QUẢN LÝ ĐỘ NHẠY & GIÃN CÁCH GIỮA CÁC LẦN QUÉT TRÙNG MÃ (TÙY CHỈNH THEO GIÂY)
+    // ===================================================================
+    const SCAN_COOLDOWN_STORAGE_KEY = 'seazen_kiosk_scan_cooldown_sec';
+    const recentScansHistory = new Map();
+    let cooldownSaveTimer = null;
+
+    function getScanCooldownSec() {
+      try {
+        const saved = localStorage.getItem(SCAN_COOLDOWN_STORAGE_KEY);
+        if (saved !== null && saved !== undefined && saved !== '') {
+          const val = parseFloat(saved);
+          if (!isNaN(val) && val >= 0) return Math.round(val);
+        }
+      } catch (e) {}
+      return 5; // Mặc định 5s như yêu cầu
+    }
+
+    function setScanCooldownSec(sec, showSavedBadge = true) {
+      const num = Math.max(0, Math.min(3600, parseInt(sec) || 0));
+      localStorage.setItem(SCAN_COOLDOWN_STORAGE_KEY, String(num));
+      updateCooldownUI(num);
+
+      if (showSavedBadge) {
+        const badge = document.getElementById('cooldown-status-badge');
+        if (badge) {
+          badge.style.display = 'inline-block';
+          clearTimeout(cooldownSaveTimer);
+          cooldownSaveTimer = setTimeout(() => {
+            badge.style.display = 'none';
+          }, 2000);
+        }
+      }
+    }
+
+    function handleScanCooldownInput(val) {
+      const num = parseInt(val);
+      if (!isNaN(num) && num >= 0) {
+        setScanCooldownSec(num, true);
+      }
+    }
+
+    function setQuickCooldown(sec) {
+      setScanCooldownSec(sec, true);
+    }
+
+    function updateCooldownUI(currentSec) {
+      const sec = (typeof currentSec === 'number') ? currentSec : getScanCooldownSec();
+      const input = document.getElementById('input-scan-cooldown');
+      if (input && document.activeElement !== input) {
+        input.value = sec;
+      }
+      [3, 5, 10, 30, 60, 300].forEach(val => {
+        const btn = document.getElementById(`btn-cd-${val}`);
+        if (btn) {
+          if (val === sec) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+    }
+
+    function isScanInCooldown(key) {
+      if (!key) return false;
+      const cooldownSec = getScanCooldownSec();
+      if (cooldownSec <= 0) return false; // 0s = không chặn
+
+      const cooldownMs = cooldownSec * 1000;
+      const cleanKey = String(key).trim().toUpperCase();
+      if (!cleanKey) return false;
+      const now = Date.now();
+      if (recentScansHistory.has(cleanKey)) {
+        const lastTime = recentScansHistory.get(cleanKey);
+        if (now - lastTime < cooldownMs) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function recordScanTimestamp(key) {
+      if (!key) return;
+      const cleanKey = String(key).trim().toUpperCase();
+      if (!cleanKey) return;
+      const now = Date.now();
+      recentScansHistory.set(cleanKey, now);
+
+      // Tự động dọn dẹp các mã lưu đã quá hạn
+      if (recentScansHistory.size > 200) {
+        const maxKeep = Math.max(30000, getScanCooldownSec() * 2000);
+        for (const [k, time] of recentScansHistory.entries()) {
+          if (now - time > maxKeep) {
+            recentScansHistory.delete(k);
+          }
+        }
+      }
+    }
+
+    function initScanCooldown() {
+      updateCooldownUI();
+    }
+
+    let isCheckInInFlight = false;
+
+    async function processCheckIn(rawString) {
       const cleanRaw = (rawString || "").trim();
       if (!cleanRaw) return;
 
-      const parsed = parseBadgeScanString(cleanRaw);
-      const empId = parsed.empId;
-
-      if (isThemeTrigger(cleanRaw) || isThemeTrigger(empId)) {
+      // 1. Lệnh điều khiển Kiosk không áp dụng cooldown
+      if (isThemeTrigger(cleanRaw)) {
         soundReady();
         toggleThemeModal();
+        clearScannerBuffers();
+        focusScanner();
+        return;
+      }
+      if (isListTrigger(cleanRaw)) {
+        soundReady();
+        toggleListModal();
+        clearScannerBuffers();
+        focusScanner();
         return;
       }
 
-      if (isListTrigger(cleanRaw) || isListTrigger(empId)) {
-        soundReady();
-        toggleListModal();
+      // 2. Kiểm tra định dạng mã quét
+      if (!isValidScanFormat(cleanRaw)) {
+        // Nếu mã sai vừa quét rồi thì bỏ qua không phát tiếng kêu liên tục
+        if (isScanInCooldown(cleanRaw)) {
+          clearScannerBuffers();
+          focusScanner();
+          return;
+        }
+        recordScanTimestamp(cleanRaw);
+        console.warn("[KIOSK] Phát hiện mã quét sai định dạng, đã từ chối hứng giá trị:", cleanRaw);
+        clearScannerBuffers();
+        soundWarning();
+        showScanFormatErrorBadge(cleanRaw);
+        focusScanner();
         return;
       }
+
+      if (!isMsAuthenticated) {
+        showLoginOverlay(true);
+        clearScannerBuffers();
+        return;
+      }
+
+      const parsed = parseBadgeScanString(cleanRaw);
+      const empId = parsed.empId;
+      const normEmpId = normalizeEmpId(empId);
+
+      // 3. KIỂM TRA ĐỘ NHẠY / GIÃN CÁCH GIỮA 2 LẦN TRÙNG MÃ (COOLDOWN CHO CẢ MÃ GỐC VÀ MÃ CHUẨN HÓA):
+      if (isScanInCooldown(cleanRaw) || (empId && isScanInCooldown(empId)) || (normEmpId && isScanInCooldown(normEmpId))) {
+        console.log(`[KIOSK] Mã ${empId || cleanRaw} vừa được xử lý, bỏ qua lần quét lặp lại trong vòng ${getScanCooldownSec()}s.`);
+        clearScannerBuffers();
+        focusScanner();
+        return;
+      }
+
+      // 4. Khóa chống xung đột khi máy quét gửi phím liên tục
+      if (isCheckInInFlight) {
+        clearScannerBuffers();
+        focusScanner();
+        return;
+      }
+
+      // Ghi nhận mốc thời gian quét để kích hoạt thời gian chờ
+      recordScanTimestamp(cleanRaw);
+      if (empId) recordScanTimestamp(empId);
+      if (normEmpId) recordScanTimestamp(normEmpId);
 
       if (isModalOpen) toggleListModal(false);
       if (isThemeModalOpen) toggleThemeModal(false);
 
-      clearTimeout(idleTimer);
-      stopAllAudio();
-
-      const viewIdle = document.getElementById('view-idle');
-      const viewResult = document.getElementById('view-result');
-      viewIdle.style.display = 'none';
-      viewResult.style.display = 'block';
-
+      isCheckInInFlight = true;
       try {
+        stopAllAudio();
         const res = await fetch(`${API_BASE}/api/checkin`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ maNV: empId, rawScan: rawString })
+          body: JSON.stringify({ maNV: normEmpId, rawScan: cleanRaw })
         });
         const result = await res.json();
 
@@ -2811,6 +3516,7 @@
           const order = result.order;
           const qty = order.quantity || 1;
           const timeStr = order.claimedAt || new Date().toTimeString().split(' ')[0];
+          const isVIP = (normEmpId === '1' || (order && normalizeEmpId(order.empId) === '1'));
 
           let qtyWarnHtml = "";
           if (qty > 1) {
@@ -2821,65 +3527,164 @@
             `;
           }
 
-          viewResult.innerHTML = `
+          const ticketContent = isVIP ? `
+            <div class="meal-ticket-card ticket-success" style="border: 2px solid #EAB308; box-shadow: 0 12px 30px rgba(234, 179, 8, 0.3);">
+              <div class="ticket-top-bar" style="background: linear-gradient(135deg, #1B263B 0%, #2D3E5E 100%);">
+                <span class="ticket-status-pill success-pill" style="background: #FEF08A; color: #854D0E; font-weight: 800; border: 1px solid #EAB308;">
+                  ★ ĐÓN TIẾP TỔNG GIÁM ĐỐC ★
+                </span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="ticket-time-badge" style="color: #FEF08A;">GIỜ: ${timeStr}</span>
+                  <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
+                </div>
+              </div>
+
+              <div class="ticket-emp-info" style="background: #FEFCE8; border: 1px solid #FEF08A;">
+                <div class="ticket-emp-id" style="color: #CA8A04;">MÃ NV: <strong>1</strong></div>
+                <div class="ticket-emp-name" style="font-size: 26px; font-weight: 900; color: #0F172A;">${escapeHtml(order.fullName || 'ĐỖ VĂN TOÀN')}</div>
+                <div class="ticket-emp-role" style="color: #B45309; font-weight: 700; font-size: 14px;">TỔNG GIÁM ĐỐC</div>
+                ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
+              </div>
+
+              ${qtyWarnHtml}
+
+              <div class="ticket-footer-msg" style="background: #1B263B; color: #FEF08A; font-weight: 800; font-size: 13.5px; letter-spacing: 0.5px;">
+                KÍNH MỜI TỔNG GIÁM ĐỐC NHẬN CƠM • CHÚC ANH NGON MIỆNG!
+              </div>
+              <div class="ticket-progress-bar" style="background: #EAB308;"></div>
+            </div>
+          ` : `
             <div class="meal-ticket-card ticket-success">
               <div class="ticket-top-bar">
                 <span class="ticket-status-pill success-pill">
                   ✓ XÁC THỰC THÀNH CÔNG
                 </span>
-                <span class="ticket-time-badge">GIỜ: ${timeStr}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="ticket-time-badge">GIỜ: ${timeStr}</span>
+                  <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
+                </div>
               </div>
 
               <div class="ticket-emp-info">
                 <div class="ticket-emp-id">MÃ NV: <strong>${order.empId}</strong></div>
                 <div class="ticket-emp-name">${order.fullName}</div>
                 <div class="ticket-emp-role">${order.role || 'Nhân viên'}</div>
+                ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
               </div>
 
               ${qtyWarnHtml}
 
               <div class="ticket-footer-msg">
-                MỜI BẠN NHẬN MÓN • CHÚC NGON MIỆNG!
+                MỜI BẠN NHẬN CƠM • CHÚC NGON MIỆNG!
               </div>
+              <div class="ticket-progress-bar"></div>
             </div>
           `;
 
-          playKioskFeedback('SUCCESS');
+          openScanPopup(ticketContent, 4500);
+
+          playKioskFeedback('SUCCESS', isVIP);
           refreshTodayOrders();
         }
-        // 2. ĐÃ NHẬN RỒI
+        // 2. CHƯA ĐẾN GIỜ (TRƯỚC 11H30 HÔM NAY)
+        else if (result.status === "BEFORE_TIME") {
+          const order = result.order;
+          const curTime = result.currentTime || new Date().toTimeString().split(' ')[0];
+
+          const empInfoHtml = (order && order.fullName) ? `
+            <div class="ticket-emp-info">
+              <div class="ticket-emp-id" style="color: #EA580C;">MÃ NV: <strong>${order.empId}</strong></div>
+              <div class="ticket-emp-name">${order.fullName}</div>
+              <div class="ticket-emp-role">${order.role || 'Nhân viên'} • Đã đăng ký: ${order.quantity || 1} suất</div>
+              ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
+            </div>` : `
+            <div class="ticket-emp-info">
+              <div class="ticket-emp-id" style="color: #EA580C;">MÃ NV: <strong>${empId}</strong></div>
+            </div>`;
+
+          openScanPopup(`
+            <div class="meal-ticket-card ticket-before-time">
+              <div class="ticket-top-bar">
+                <span class="ticket-status-pill before-time-pill">
+                  ⏰ CHƯA ĐẾN GIỜ ĐIỂM DANH
+                </span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="ticket-time-badge">LÚC: ${curTime}</span>
+                  <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
+                </div>
+              </div>
+
+              ${empInfoHtml}
+
+              <div class="ticket-alert-box before-time-alert">
+                <strong>CHƯA ĐẾN GIỜ NHẬN CƠM TRƯA!</strong>
+                <p>Khung giờ phục vụ bắt đầu từ <strong>11:30</strong> hôm nay.<br>Vui lòng quay lại quét thẻ nhận cơm sau 11:30.</p>
+              </div>
+
+              <div class="ticket-footer-msg msg-warning">
+                HỆ THỐNG MỞ ĐIỂM DANH TỪ 11:30 HÀNG NGÀY
+              </div>
+              <div class="ticket-progress-bar"></div>
+            </div>
+          `, 5000);
+
+          playKioskFeedback('BEFORE_TIME');
+        }
+        // 3. ĐÃ NHẬN RỒI
         else if (result.status === "ALREADY_CLAIMED") {
           const order = result.order;
-          viewResult.innerHTML = `
+          openScanPopup(`
             <div class="meal-ticket-card ticket-warning">
               <div class="ticket-top-bar">
                 <span class="ticket-status-pill warning-pill">
-                  ⚠️ ĐÃ NHẬN PHẦN ĂN
+                  ⚠️ ĐÃ NHẬN CƠM
                 </span>
-                <span class="ticket-time-badge">LÚC ${order.claimedAt || '11:30'}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="ticket-time-badge">LÚC ${order.claimedAt || '11:30'}</span>
+                  <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
+                </div>
               </div>
 
               <div class="ticket-emp-info">
                 <div class="ticket-emp-id" style="color: #D97706;">MÃ NV: <strong>${order.empId}</strong></div>
                 <div class="ticket-emp-name">${order.fullName}</div>
+                ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
               </div>
 
               <div class="ticket-alert-box warning-alert">
-                <strong>MÃ THẺ NÀY ĐÃ NHẬN PHẦN ĂN TRƯỚC ĐÓ!</strong>
-                <p>Mỗi nhân viên chỉ nhận 1 lần theo đăng ký trên app.</p>
+                <strong>MÃ THẺ NÀY ĐÃ NHẬN CƠM TRƯỚC ĐÓ!</strong>
+                <p>Mỗi nhân viên chỉ nhận 1 lần theo số lượng đăng ký trên app.</p>
               </div>
+
+              <div class="ticket-footer-msg msg-warning">
+                NẾU CÓ THẮC MẮC VUI LÒNG LIÊN HỆ QUẢN LÝ BẾP
+              </div>
+              <div class="ticket-progress-bar"></div>
             </div>
-          `;
+          `, 4500);
+
           playKioskFeedback('ALREADY_CLAIMED');
         }
-        // 3. CHƯA ĐĂNG KÝ TRÊN APP
+        else if (result.status === "SYNC_ERROR") {
+          openScanPopup(`
+            <div class="meal-ticket-card ticket-error">
+              <div class="ticket-top-bar"><span class="ticket-status-pill error-pill">✕ CHƯA GHI NHẬN</span></div>
+              <div class="ticket-emp-info"><div class="ticket-emp-id">MÃ NV: <strong>${escapeHtml(empId)}</strong></div></div>
+              <div class="ticket-alert-box error-alert"><strong>Không đồng bộ được SharePoint</strong>
+                <p>${escapeHtml(result.message || 'Vui lòng thử lại hoặc liên hệ quản lý bếp.')}</p></div>
+            </div>
+          `, 6000);
+          playKioskFeedback('NOT_REGISTERED');
+        }
+        // 4. CHƯA ĐĂNG KÝ TRÊN APP
         else {
-          viewResult.innerHTML = `
+          openScanPopup(`
             <div class="meal-ticket-card ticket-error">
               <div class="ticket-top-bar">
                 <span class="ticket-status-pill error-pill">
                   ✕ CHƯA ĐĂNG KÝ
                 </span>
+                <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
               </div>
 
               <div class="ticket-emp-info">
@@ -2889,25 +3694,29 @@
 
               <div class="ticket-alert-box error-alert">
                 <strong>BẠN CHƯA ĐĂNG KÝ CƠM TRÊN APP!</strong>
-                <p>Hạn chốt đăng ký trước 08:30 sáng. Thông tin chi tiết tại App SeazenHR</p>
+                <p>Hạn chốt đăng ký trước 08:30 sáng hàng ngày trên App SeazenHR.</p>
               </div>
+
+              <div class="ticket-footer-msg msg-error">
+                LIÊN HỆ PHÒNG NHÂN SỰ ĐỂ ĐƯỢC HỖ TRỢ
+              </div>
+              <div class="ticket-progress-bar"></div>
             </div>
-          `;
+          `, 4500);
+
           playKioskFeedback('NOT_REGISTERED');
         }
       } catch (err) {
         console.error("Lỗi:", err);
+      } finally {
+        isCheckInInFlight = false;
+        clearScannerBuffers();
+        focusScanner();
       }
-
-      idleTimer = setTimeout(resetToIdle, 4500);
     }
 
     function resetToIdle() {
-      clearTimeout(idleTimer);
-      clearScannerBuffers();
-      document.getElementById('view-result').style.display = 'none';
-      document.getElementById('view-idle').style.display = 'flex';
-      focusScanner();
+      closeScanPopup();
     }
 
     // ===================================================================
@@ -2996,7 +3805,8 @@
         const q = searchQuery.trim().toLowerCase();
         list = list.filter(item =>
           (item.fullName || '').toLowerCase().includes(q) ||
-          (item.empId || '').toLowerCase().includes(q)
+          (item.empId || '').toLowerCase().includes(q) ||
+          (item.note || '').toLowerCase().includes(q)
         );
       }
 
@@ -3021,7 +3831,7 @@
       if (!cachedAllOrders || cachedAllOrders.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 35px; font-weight: 600;">
+            <td colspan="6" style="text-align: center; color: var(--theme-text-muted); padding: 35px; font-weight: 600;">
               Chưa có dữ liệu đăng ký suất ăn nào trong hôm nay
             </td>
           </tr>`;
@@ -3036,7 +3846,7 @@
           : `Không có suất ăn nào trong danh mục này`;
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px; font-weight: 600;">
+            <td colspan="6" style="text-align: center; color: var(--theme-text-muted); padding: 30px; font-weight: 600;">
               ${msg}
             </td>
           </tr>`;
@@ -3053,6 +3863,10 @@
 
         const timeDisplay = (isClaimed && item.claimedAt) ? item.claimedAt : '-';
         const timeClass = (isClaimed && item.claimedAt) ? 'col-time' : 'col-time is-empty';
+        const noteText = item.note || '';
+        const noteDisplay = noteText
+          ? `<span class="note-pill" title="${escapeHtml(noteText)}">📝 ${escapeHtml(noteText)}</span>`
+          : `<span style="color: #CBD5E1;">-</span>`;
 
         tr.innerHTML = `
           <td class="col-stt">${index + 1}</td>
@@ -3060,6 +3874,7 @@
           <td class="col-fullname">${escapeHtml(item.fullName || 'Nhân viên')}</td>
           <td class="col-status">${statusBadge}</td>
           <td class="${timeClass}">${escapeHtml(timeDisplay)}</td>
+          <td class="col-note">${noteDisplay}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -3079,8 +3894,13 @@
         .replace(/'/g, '&#039;');
     }
 
-    // XUẤT EXCEL (CSV UTF-8 BOM CHUẨN TIẾNG VIỆT CHO EXCEL WINDOWS)
-    function exportModalToExcel() {
+    // XUẤT EXCEL CHUẨN DOANH NGHIỆP (.XLSX ĐẦY ĐỦ MÀU SẮC, BORDER, CỘT RỘNG RÃI)
+    async function exportModalToExcel() {
+      const auth = getStoredAuth();
+      if (!auth || !auth.token) {
+        alert('Vui lòng đăng nhập để xuất Excel.');
+        return;
+      }
       const sInput = document.getElementById('modal-search-input');
       const list = getModalFilteredList(sInput ? sInput.value : '');
       if (!list || list.length === 0) {
@@ -3089,27 +3909,121 @@
       }
 
       const dateStr = document.getElementById('modal-date-label')?.innerText || new Date().toISOString().slice(0, 10);
-      let csv = '\uFEFF'; // Unicode UTF-8 BOM để Excel hiển thị tiếng Việt chuẩn 100%
-      csv += 'BÁO CÁO CHI TIẾT SUẤT ĂN CANTEEN SEAZEN\n';
-      csv += `Ngày ăn: ${dateStr}\n`;
-      csv += `Thời gian xuất: ${new Date().toLocaleTimeString('vi-VN')} ngày ${new Date().toLocaleDateString('vi-VN')}\n`;
-      csv += `Tổng số suất hiển thị: ${list.length}\n\n`;
-      csv += 'STT,MÃ NHÂN VIÊN,HỌ VÀ TÊN,TRẠNG THÁI,GIỜ NHẬN\n';
+      const cleanDate = dateStr.replace(/[^0-9-]/g, '_');
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/export-excel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Auth-Token': auth.token },
+          body: JSON.stringify({
+            date: dateStr,
+            orders: list
+          })
+        });
+
+        if (resp.ok) {
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Danh_Sach_Suat_An_${cleanDate}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          return;
+        }
+        if (resp.status === 401) {
+          setStoredAuth(null);
+          alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          return;
+        }
+        throw new Error(`HTTP ${resp.status}`);
+      } catch (err) {
+        alert('Không thể xuất Excel: ' + err.message);
+      }
+    }
+
+    function exportModalToExcelClientFallback(list, dateStr, cleanDate) {
+      let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+        <style>
+          table { border-collapse: collapse; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 11pt; }
+          .title-banner { background-color: #1B263B; color: #FFFFFF; font-size: 15pt; font-weight: bold; text-align: center; height: 42px; vertical-align: middle; }
+          .meta-label { font-size: 10pt; font-weight: bold; color: #475569; padding: 4px 8px; }
+          .meta-val { font-size: 10pt; color: #1E293B; padding: 4px 8px; }
+          .th-col { background-color: #1B263B; color: #FFFFFF; font-weight: bold; border: 1px solid #CBD5E1; text-align: center; height: 32px; vertical-align: middle; }
+          .td-cell { border: 1px solid #CBD5E1; vertical-align: middle; height: 26px; }
+          .td-stt { text-align: center; color: #64748B; width: 60px; }
+          .td-empid { text-align: center; font-weight: bold; color: #1E3A8A; width: 140px; mso-number-format:"\\@"; }
+          .td-name { text-align: left; padding-left: 10px; font-weight: bold; color: #0F172A; width: 280px; }
+          .td-claimed { background-color: #DCFCE7; color: #15803D; font-weight: bold; text-align: center; width: 150px; }
+          .td-waiting { background-color: #FEF3C7; color: #B45309; font-weight: bold; text-align: center; width: 150px; }
+          .td-time { text-align: center; color: #334155; width: 130px; }
+          .td-note { text-align: left; padding-left: 10px; color: #475569; width: 260px; }
+          .footer-row { background-color: #F1F5F9; font-weight: bold; border-top: 1px solid #CBD5E1; border-bottom: 2px solid #0F172A; height: 32px; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <tr><td colspan="6" class="title-banner">BÁO CÁO CHI TIẾT SUẤT ĂN CANTEEN SEAZEN</td></tr>
+          <tr><td colspan="6" style="height: 10px;"></td></tr>
+          <tr>
+            <td colspan="2" class="meta-label">Ngày phục vụ: <span class="meta-val">${escapeHtml(dateStr)}</span></td>
+            <td colspan="4" class="meta-label">Thời gian xuất: <span class="meta-val">${new Date().toLocaleTimeString('vi-VN')} ngày ${new Date().toLocaleDateString('vi-VN')}</span></td>
+          </tr>
+          <tr>
+            <td colspan="2" class="meta-label">Tổng số suất: <span class="meta-val" style="font-weight: bold; color: #0F172A;">${list.length} suất</span></td>
+            <td colspan="4" class="meta-label">Tình trạng: <span class="meta-val" style="font-weight: bold; color: #15803D;">Đã nhận: ${list.filter(i => isOrderClaimed(i.status)).length}</span> | <span class="meta-val" style="font-weight: bold; color: #B45309;">Chưa nhận: ${list.filter(i => !isOrderClaimed(i.status)).length}</span></td>
+          </tr>
+          <tr><td colspan="6" style="height: 10px;"></td></tr>
+          <tr>
+            <th class="th-col" style="width: 55px;">STT</th>
+            <th class="th-col" style="width: 140px;">MÃ NHÂN VIÊN</th>
+            <th class="th-col" style="width: 280px;">HỌ VÀ TÊN</th>
+            <th class="th-col" style="width: 150px;">TRẠNG THÁI</th>
+            <th class="th-col" style="width: 130px;">GIỜ NHẬN</th>
+            <th class="th-col" style="width: 260px;">GHI CHÚ</th>
+          </tr>`;
 
       list.forEach((item, index) => {
         const isClaimed = isOrderClaimed(item.status);
-        const statusText = isClaimed ? 'Đã nhận cơm' : 'Chưa nhận';
-        const timeText = (isClaimed && item.claimedAt) ? item.claimedAt : '';
-        const safeEmpId = `="${(item.empId || '').replace(/"/g, '""')}"`;
-        const safeName = `"${(item.fullName || '').replace(/"/g, '""')}"`;
-        csv += `${index + 1},${safeEmpId},${safeName},"${statusText}","${timeText}"\n`;
+        const statusClass = isClaimed ? 'td-claimed' : 'td-waiting';
+        const statusLabel = isClaimed ? '✓ Đã nhận cơm' : '⏳ Chưa nhận';
+        const timeDisplay = (isClaimed && item.claimedAt) ? item.claimedAt : '-';
+        const rowBg = (index % 2 === 1) ? 'style="background-color: #F8FAFC;"' : 'style="background-color: #FFFFFF;"';
+
+        html += `
+          <tr ${rowBg}>
+            <td class="td-cell td-stt">${index + 1}</td>
+            <td class="td-cell td-empid">${escapeHtml(item.empId || '')}</td>
+            <td class="td-cell td-name">${escapeHtml(item.fullName || '')}</td>
+            <td class="td-cell ${statusClass}">${statusLabel}</td>
+            <td class="td-cell td-time">${escapeHtml(timeDisplay)}</td>
+            <td class="td-cell td-note">${escapeHtml(item.note || '')}</td>
+          </tr>`;
       });
 
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const totalClaimed = list.filter(i => isOrderClaimed(i.status)).length;
+      const totalWaiting = list.length - totalClaimed;
+
+      html += `
+          <tr>
+            <td colspan="3" class="footer-row" style="text-align: right; padding-right: 12px;">TỔNG CỘNG DANH SÁCH (${list.length} suất):</td>
+            <td class="footer-row td-claimed">Đã nhận: ${totalClaimed}</td>
+            <td class="footer-row td-waiting">Chưa: ${totalWaiting}</td>
+            <td class="footer-row"></td>
+          </tr>
+        </table>
+      </body>
+      </html>`;
+
+      const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Danh_Sach_Suat_An_${dateStr.replace(/[^0-9-]/g, '_')}.csv`;
+      a.download = `Danh_Sach_Suat_An_${cleanDate}.xls`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -3144,6 +4058,7 @@
             <td style="padding: 8px 10px; font-weight: 600;">${escapeHtml(item.fullName || '')}</td>
             <td style="padding: 8px 10px; text-align: center;">${statusText}</td>
             <td style="padding: 8px 10px; text-align: center; font-family: monospace;">${escapeHtml(timeText)}</td>
+            <td style="padding: 8px 10px; font-size: 11px; color: #475569;">${escapeHtml(item.note || '-')}</td>
           </tr>
         `;
       });
@@ -3243,9 +4158,12 @@
 </head>
 <body>
   <div class="report-header">
-    <div>
-      <div class="company-name">CÔNG TY CỔ PHẦN DỊCH VỤ BẢO VỆ SEAZEN</div>
-      <div class="company-sub">HỆ THỐNG ĐIỂM DANH CANTEEN TỰ ĐỘNG - SEAZEN CANTEEN KIOSK</div>
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <img src="seazen_logo.png" style="height: 48px; object-fit: contain;" />
+      <div>
+        <div class="company-name">CÔNG TY CỔ PHẦN DỊCH VỤ BẢO VỆ SEAZEN</div>
+        <div class="company-sub">HỆ THỐNG ĐIỂM DANH CANTEEN TỰ ĐỘNG - SEAZEN CANTEEN KIOSK</div>
+      </div>
     </div>
     <div style="text-align: right; font-size: 11px; color: #64748B;">
       <div>Giờ xuất: ${new Date().toLocaleTimeString('vi-VN')}</div>
@@ -3270,6 +4188,7 @@
         <th>Họ và Tên</th>
         <th style="width: 140px; text-align: center;">Trạng Thái</th>
         <th style="width: 110px; text-align: center;">Giờ Nhận</th>
+        <th style="width: 170px;">Ghi Chú</th>
       </tr>
     </thead>
     <tbody>
@@ -3307,25 +4226,53 @@
     }
 
     // ===================================================================
-    // AUTHENTICATION & LOGIN LOGIC (SHAREPOINT USERLOGIN INTEGRATION)
+    // XÁC THỰC BẮT BUỘC MICROSOFT 365 (MSAL OAUTH2 & APPDATA STORAGE)
     // ===================================================================
+    let isMsAuthenticated = false;
     let isAuthModalOpen = false;
     let authPollingInterval = null;
+    let devicePollInterval = null;
 
-    function getStoredAuth() {
-      try {
-        const str = localStorage.getItem('seazen_kiosk_auth');
-        return str ? JSON.parse(str) : null;
-      } catch (e) {
-        return null;
+    function showLoginOverlay(show = true) {
+      const overlay = document.getElementById('login-overlay');
+      isAuthModalOpen = show;
+      if (!overlay) return;
+      if (show) {
+        overlay.style.display = 'flex';
+        clearScannerBuffers();
+      } else {
+        overlay.style.display = 'none';
+        focusScanner();
       }
     }
 
-    function setStoredAuth(data) {
-      if (!data) {
-        localStorage.removeItem('seazen_kiosk_auth');
+    function switchAuthTab(tabName) {
+      const pBrowser = document.getElementById('auth-panel-browser');
+      const pDevice = document.getElementById('auth-panel-device');
+      const pForm = document.getElementById('auth-panel-form');
+
+      const bBrowser = document.getElementById('tab-btn-browser');
+      const bDevice = document.getElementById('tab-btn-device');
+      const bForm = document.getElementById('tab-btn-form');
+
+      const alertEl = document.getElementById('login-alert');
+      if (alertEl) alertEl.style.display = 'none';
+
+      if (pBrowser) pBrowser.style.display = (tabName === 'browser') ? 'block' : 'none';
+      if (pDevice) pDevice.style.display = (tabName === 'device') ? 'block' : 'none';
+      if (pForm) pForm.style.display = (tabName === 'form') ? 'block' : 'none';
+
+      if (bBrowser) bBrowser.className = 'auth-tab-btn' + (tabName === 'browser' ? ' active' : '');
+      if (bDevice) bDevice.className = 'auth-tab-btn' + (tabName === 'device' ? ' active' : '');
+      if (bForm) bForm.className = 'auth-tab-btn' + (tabName === 'form' ? ' active' : '');
+
+      if (tabName === 'device') {
+        startMsDeviceCodeFlow();
       } else {
-        localStorage.setItem('seazen_kiosk_auth', JSON.stringify(data));
+        if (devicePollInterval) {
+          clearInterval(devicePollInterval);
+          devicePollInterval = null;
+        }
       }
     }
 
@@ -3333,143 +4280,193 @@
       const badge = document.getElementById('auth-user-badge');
       const nameEl = document.getElementById('auth-user-name');
       if (badge && nameEl && user) {
-        nameEl.innerText = user.fullName || user.username || 'User';
-        nameEl.title = `${user.fullName || user.username} (${user.department || 'SEAZEN'})`;
+        nameEl.innerText = user.fullName || user.username || 'Microsoft 365';
+        nameEl.title = `Tài khoản Microsoft 365: ${user.username || user.fullName}`;
         badge.style.display = 'flex';
       }
     }
 
-    function togglePasswordVisibility() {
-      const input = document.getElementById('login-password');
-      const icon = document.getElementById('pwd-toggle-icon');
-      if (!input) return;
-      if (input.type === 'password') {
-        input.type = 'text';
-        if (icon) icon.innerText = '🙈';
-      } else {
-        input.type = 'password';
-        if (icon) icon.innerText = '👁';
-      }
-    }
-
-    function showLoginOverlay(show = true) {
-      const overlay = document.getElementById('login-overlay');
-      isAuthModalOpen = show;
-      if (!overlay) return;
-
-      if (show) {
-        overlay.style.display = 'flex';
-        clearScannerBuffers();
-        setTimeout(() => {
-          const uInput = document.getElementById('login-username');
-          if (uInput) uInput.focus();
-        }, 200);
-      } else {
-        overlay.style.display = 'none';
-        focusScanner();
-      }
-    }
-
-    async function handleLoginSubmit(event) {
-      if (event) event.preventDefault();
-      const uInput = document.getElementById('login-username');
-      const pInput = document.getElementById('login-password');
+    async function triggerMsInteractiveLogin() {
       const alertEl = document.getElementById('login-alert');
-      const submitBtn = document.getElementById('btn-login-submit');
-      const submitText = document.getElementById('login-submit-text');
-      const spinner = document.getElementById('login-spinner');
+      const btn = document.getElementById('btn-ms-interactive');
+      const txt = document.getElementById('ms-login-text');
+      const sp = document.getElementById('ms-login-spinner');
+
+      if (alertEl) alertEl.style.display = 'none';
+      if (btn) btn.disabled = true;
+      if (txt) txt.innerText = 'ĐANG MỞ TRÌNH DUYỆT XÁC THỰC...';
+      if (sp) sp.style.display = 'inline-block';
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/auth/ms-login-interactive`, { method: 'POST' });
+        const data = await resp.json();
+        if (resp.ok && data.status === 'SUCCESS') {
+          isMsAuthenticated = true;
+          showLoginOverlay(false);
+          updateAuthBadge(data.account || { username: 'Microsoft Account' });
+          soundReady();
+          refreshTodayOrders(true);
+        } else {
+          if (alertEl) {
+            alertEl.style.display = 'block';
+            alertEl.innerText = data.message || 'Đăng nhập không thành công.';
+          }
+        }
+      } catch (e) {
+        if (alertEl) {
+          alertEl.style.display = 'block';
+          alertEl.innerText = 'Không thể kết nối máy chủ: ' + e.message;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+        if (txt) txt.innerText = 'ĐĂNG NHẬP BẰNG MICROSOFT 365';
+        if (sp) sp.style.display = 'none';
+      }
+    }
+
+    async function startMsDeviceCodeFlow() {
+      const alertEl = document.getElementById('login-alert');
+      const codeEl = document.getElementById('device-flow-code');
+      const statusEl = document.getElementById('device-flow-status');
+      const linkEl = document.getElementById('device-flow-link');
+
+      if (codeEl) codeEl.innerText = 'ĐANG TẠO MÃ...';
+      if (statusEl) statusEl.innerText = 'Đang kết nối Microsoft Entra ID...';
+
+      if (devicePollInterval) {
+        clearInterval(devicePollInterval);
+        devicePollInterval = null;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/auth/ms-device-code`, { method: 'POST' });
+        const data = await resp.json();
+        if (resp.ok && data.status === 'SUCCESS') {
+          if (codeEl) codeEl.innerText = data.userCode || '--------';
+          if (linkEl && data.verificationUri) linkEl.href = data.verificationUri;
+          if (statusEl) statusEl.innerText = 'Đang chờ bạn xác thực mã trên trình duyệt...';
+
+          // Bắt đầu chu kỳ thăm dò kết quả
+          devicePollInterval = setInterval(async () => {
+            try {
+              const pollRes = await fetch(`${API_BASE}/api/auth/ms-device-poll`, { method: 'POST' });
+              const pollData = await pollRes.json();
+              if (pollRes.ok && pollData.status === 'SUCCESS') {
+                clearInterval(devicePollInterval);
+                devicePollInterval = null;
+                isMsAuthenticated = true;
+                showLoginOverlay(false);
+                updateAuthBadge(pollData.account || { username: 'Microsoft Account' });
+                soundReady();
+                refreshTodayOrders(true);
+              } else if (pollData.status !== 'PENDING') {
+                clearInterval(devicePollInterval);
+                devicePollInterval = null;
+                if (statusEl) statusEl.innerText = 'Xác thực thất bại: ' + (pollData.message || '');
+              }
+            } catch (err) { }
+          }, 3000);
+        } else {
+          if (codeEl) codeEl.innerText = 'LỖI TẠO MÃ';
+          if (statusEl) statusEl.innerText = data.message || 'Không thể tạo Device Code.';
+        }
+      } catch (err) {
+        if (codeEl) codeEl.innerText = 'LỖI MẠNG';
+        if (statusEl) statusEl.innerText = err.message;
+      }
+    }
+
+    async function handleMsCredsSubmit(event) {
+      if (event) event.preventDefault();
+      const uInput = document.getElementById('ms-username');
+      const pInput = document.getElementById('ms-password');
+      const alertEl = document.getElementById('login-alert');
+      const btn = document.getElementById('btn-ms-creds-submit');
+      const txt = document.getElementById('creds-submit-text');
+      const sp = document.getElementById('creds-spinner');
 
       const username = uInput ? uInput.value.trim() : '';
       const password = pInput ? pInput.value.trim() : '';
 
-      if (!username || !password) {
-        if (alertEl) {
-          alertEl.style.display = 'block';
-          alertEl.innerText = 'Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!';
-        }
-        return;
-      }
+      if (!username || !password) return;
 
-      // Show loading
       if (alertEl) alertEl.style.display = 'none';
-      if (submitBtn) submitBtn.disabled = true;
-      if (submitText) submitText.innerText = 'ĐANG XÁC THỰC...';
-      if (spinner) spinner.style.display = 'inline-block';
+      if (btn) btn.disabled = true;
+      if (txt) txt.innerText = 'ĐANG XÁC THỰC...';
+      if (sp) sp.style.display = 'inline-block';
 
       try {
-        const resp = await fetch(`${API_BASE}/api/login`, {
+        const resp = await fetch(`${API_BASE}/api/auth/ms-login-credentials`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-
         const data = await resp.json();
-
         if (resp.ok && data.status === 'SUCCESS') {
-          setStoredAuth({ token: data.token, user: data.user });
-          updateAuthBadge(data.user);
+          isMsAuthenticated = true;
           showLoginOverlay(false);
-
-          // Bắt đầu chu kỳ làm mới dữ liệu
+          updateAuthBadge(data.account || { username });
+          soundReady();
           refreshTodayOrders(true);
-          if (!authPollingInterval) {
-            authPollingInterval = setInterval(() => refreshTodayOrders(false), 4000);
-          }
         } else {
           if (alertEl) {
             alertEl.style.display = 'block';
-            alertEl.innerText = data.message || 'Đăng nhập thất bại!';
+            alertEl.innerText = data.message || 'Xác thực không thành công.';
           }
         }
       } catch (err) {
         if (alertEl) {
           alertEl.style.display = 'block';
-          alertEl.innerText = 'Không thể kết nối đến máy chủ: ' + err.message;
+          alertEl.innerText = 'Lỗi mạng: ' + err.message;
         }
       } finally {
-        if (submitBtn) submitBtn.disabled = false;
-        if (submitText) submitText.innerText = 'ĐĂNG NHẬP';
-        if (spinner) spinner.style.display = 'none';
+        if (btn) btn.disabled = false;
+        if (txt) txt.innerText = 'XÁC THỰC TÀI KHOẢN';
+        if (sp) sp.style.display = 'none';
       }
     }
 
-    async function handleLogout() {
-      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi Kiosk?')) {
-        const auth = getStoredAuth();
-        if (auth && auth.token) {
-          try {
-            await fetch(`${API_BASE}/api/auth/logout`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token: auth.token })
-            });
-          } catch (e) { }
-        }
-        setStoredAuth(null);
-        location.reload();
-      }
-    }
-
-    function initAuth() {
-      const auth = getStoredAuth();
-      if (auth && auth.user) {
-        updateAuthBadge(auth.user);
-        showLoginOverlay(false);
-        refreshTodayOrders(true);
-        if (!authPollingInterval) {
-          authPollingInterval = setInterval(() => refreshTodayOrders(false), 4000);
-        }
-        // Verify token in background
-        if (auth.token) {
-          fetch(`${API_BASE}/api/auth/verify?token=${encodeURIComponent(auth.token)}`).then(r => {
-            if (!r.ok) {
-              setStoredAuth(null);
-              showLoginOverlay(true);
-            }
-          }).catch(() => { });
-        }
-      } else {
+    async function handleMsLogout() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất tài khoản Microsoft 365?')) {
+        try {
+          await fetch(`${API_BASE}/api/auth/ms-logout`, { method: 'POST' });
+        } catch (e) { }
+        isMsAuthenticated = false;
         showLoginOverlay(true);
+        const badge = document.getElementById('auth-user-badge');
+        if (badge) badge.style.display = 'none';
+        const spBadge = document.getElementById('sp-status');
+        if (spBadge) {
+          spBadge.innerText = '● MICROSOFT 365: CHƯA ĐĂNG NHẬP';
+          spBadge.style.color = '#FCA5A5';
+        }
+      }
+    }
+
+    async function initAuth() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/auth/ms-status`);
+        const status = await resp.json();
+        if (status.authenticated) {
+          isMsAuthenticated = true;
+          showLoginOverlay(false);
+          updateAuthBadge({ username: status.account, fullName: status.name || status.account });
+          refreshTodayOrders(true);
+        } else {
+          isMsAuthenticated = false;
+          showLoginOverlay(true);
+        }
+      } catch (e) {
+        isMsAuthenticated = false;
+        showLoginOverlay(true);
+      }
+
+      if (!authPollingInterval) {
+        authPollingInterval = setInterval(() => {
+          if (isMsAuthenticated) {
+            refreshTodayOrders(false);
+          }
+        }, 4000);
       }
     }
 
@@ -3488,7 +4485,7 @@
       clearTimeout(scannerIdleTimeout);
       scannerIdleTimeout = setTimeout(() => {
         clearScannerBuffers();
-      }, 350);
+      }, 2500); // Tăng lên 2.5s để người dùng thoải mái gõ chuỗi dài hoặc dán không bị xóa giữa chừng
     }
 
     function focusScanner() {
@@ -3506,39 +4503,78 @@
     setInterval(focusScanner, 1500);
 
     hiddenInput.addEventListener('input', function () {
-      resetScannerIdleTimer();
-    });
-
-    hiddenInput.addEventListener('keydown', function (e) {
-      if (isAuthModalOpen) return;
-      resetScannerIdleTimer();
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        clearTimeout(scannerIdleTimeout);
-        const val = hiddenInput.value;
+      const currentVal = hiddenInput.value || '';
+      if (isProhibitedScanPrefix(currentVal)) {
         clearScannerBuffers();
-        if (val && val.trim().length > 0) {
-          processCheckIn(val);
-        }
+        showScanFormatErrorBadge(currentVal);
+        soundWarning();
+        return;
       }
+      resetScannerIdleTimer();
     });
 
+    // CHẶN TRIỆT ĐỂ Ở CAPTURE PHASE: Ngăn máy quét kích hoạt các phím tắt mở Tab mới (Ctrl+T, Ctrl+N, Tab, F-keys...)
     window.addEventListener('keydown', function (e) {
-      if (isAuthModalOpen) return; // Allow normal typing in login inputs
+      if (isAuthModalOpen) return; // Cho phép nhập form đăng nhập bình thường
 
-      if (e.key === 'Escape') {
-        if (isModalOpen) toggleListModal(false);
-        if (isThemeModalOpen) toggleThemeModal(false);
-        clearScannerBuffers();
+      // 1. Chặn phím Tab để tránh máy quét nhảy focus sang nút bấm hoặc thanh trình duyệt
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+        focusScanner();
         return;
       }
 
-      if (e.target === hiddenInput) return;
+      // 2. Chặn các tổ hợp phím Ctrl nguy hiểm có thể mở tab mới hoặc cửa sổ mới (không chặn phím gõ tiếng Việt hay Ctrl+V)
+      if (e.ctrlKey && !e.altKey) {
+        const k = (e.key || '').toLowerCase();
+        if (['t', 'n', 'w', 'l'].includes(k)) {
+          e.preventDefault();
+          e.stopPropagation();
+          clearScannerBuffers();
+          focusScanner();
+          return;
+        }
+      }
 
+      // 3. Chặn các phím chức năng F1-F12 (ngoại trừ F11 toàn màn hình)
+      if (e.key && e.key.startsWith('F') && e.key.length > 1 && e.key !== 'F11') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (isScanPopupOpen) closeScanPopup();
+        if (isModalOpen) toggleListModal(false);
+        if (isThemeModalOpen) toggleThemeModal(false);
+        clearScannerBuffers();
+        focusScanner();
+        return;
+      }
+
+      // Nếu đang focus trong hiddenInput
+      if (e.target === hiddenInput) {
+        resetScannerIdleTimer();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          clearTimeout(scannerIdleTimeout);
+          const val = hiddenInput.value;
+          clearScannerBuffers();
+          if (val && val.trim().length > 0) {
+            processCheckIn(val);
+          }
+        }
+        return;
+      }
+
+      // Nếu sự kiện rơi vào window ngoài hiddenInput (Bộ đệm phím toàn cục dự phòng)
       resetScannerIdleTimer();
 
       if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
         clearTimeout(scannerIdleTimeout);
         const finalVal = (hiddenInput ? hiddenInput.value : '') || scanBuffer;
         clearScannerBuffers();
@@ -3551,18 +4587,26 @@
 
       if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
         const now = Date.now();
-        if (now - lastKeyTime > 350) {
+        if (now - lastKeyTime > 2500) {
           scanBuffer = '';
         }
         scanBuffer += e.key;
         lastKeyTime = now;
+
+        if (isProhibitedScanPrefix(scanBuffer)) {
+          clearScannerBuffers();
+          showScanFormatErrorBadge(scanBuffer);
+          soundWarning();
+          return;
+        }
       }
       focusScanner();
-    });
+    }, true);
 
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       initVoice();
+      initScanCooldown();
       setTimeout(dismissIntro, 1800);
       initAuth();
     });

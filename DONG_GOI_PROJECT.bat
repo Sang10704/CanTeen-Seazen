@@ -1,8 +1,8 @@
 @echo off
-title DONG GOI SEAZEN CANTEEN KIOSK
+title DONG GOI SEAZEN CANTEEN KIOSK STANDALONE
 cd /d "%~dp0"
 echo ===================================================================
-echo             DONG GOI SEAZEN CANTEEN KIOSK DE GUI MAY KHAC
+echo   DONG GOI SEAZEN CANTEEN KIOSK - BAN DOC LAP 1 FILE EXE DUY NHAT
 echo ===================================================================
 echo.
 
@@ -12,19 +12,15 @@ if exist "%LocalAppData%\Programs\Python\Python311\python.exe" (
     set PY_EXE=py
 )
 
-echo [1/2] Dang bien dich file chay SEAZEN_Canteen_Kiosk.exe qua PyInstaller...
-%PY_EXE% -m PyInstaller --clean --noconfirm --onefile --name "SEAZEN_Canteen_Kiosk" --icon "canteen_icon.ico" --add-data "Canteen_Kiosk_Production.html;." --add-data "token_cache.bin;." --add-data "mp3;mp3" Canteen_Kiosk_Runner.py
-
-echo.
-echo [2/2] Dang dong goi tat ca file va nen thanh SEAZEN_Canteen_Kiosk_Full_Package.zip...
+echo [*] Dang bien dich va dong goi bang PyInstaller qua package_release.py...
 %PY_EXE% package_release.py
 
-REM Don dep thu muc build tam cua PyInstaller de thu muc luon sach se
+REM Don dep thu muc build tam
 if exist "build" rmdir /s /q "build"
 
 echo.
 echo ===================================================================
-echo  HOAN TAT! Ban chi can gui file:
-echo  D:\SeaZen APP\CanTeen-Seazen\SEAZEN_Canteen_Kiosk_Full_Package.zip
+echo  HOAN TAT! Ban chi can gui duy nhat 1 file EXE:
+echo  %~dp0SEAZEN_Canteen_Kiosk.exe
 echo ===================================================================
 pause

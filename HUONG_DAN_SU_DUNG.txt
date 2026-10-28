@@ -1,76 +1,25 @@
-===================================================================
-      HE THONG DIEM DANH CANTEEN SEAZEN (PORTABLE STANDALONE)
-===================================================================
+======================================================================
+         HE THONG DIEM DANH CANTEEN SEAZEN (BAN DOC LAP 1 FILE EXE)
+======================================================================
 
-[1. HUONG DAN SU DUNG CHO MAY MOI / MAY KHAC]:
-1. May tinh nhan KHONG CAN cai dat Python hay bat ky phan mem nao khac.
-2. Chi can giai nen toan bo thu muc nay ra mot o dia (Vi du: C:\Canteen_Kiosk hoac Desktop).
-3. Nhap dup chuot vao file: SEAZEN_Canteen_Kiosk.exe de khoi chay.
-4. He thong se tu dong bat trinh duyet hien thi man hinh Kiosk toan man hinh (hoac truy cap: http://localhost:5000).
-5. Muon tat he thong: Dong cua so Terminal chay ngam hoac nhan to hop phim Ctrl + C.
+1. CACH SU DUNG:
+- Chi can gui duy nhat tep tin: SEAZEN_Canteen_Kiosk.exe toi may tram.
+- May tinh nhan KHONG CAN cai dat Python, thu vien hay bat ky tep phu tro nao.
+- Nhap dup chuot vao SEAZEN_Canteen_Kiosk.exe de khoi chay he thong.
+- Ung dung tu dong khoi chay may chu noi bo va mo trinh duyet tai:
+  http://localhost:5000
 
-===================================================================
-[2. DANG NHAP VA PHAN QUYEN HE THONG (SHAREPOINT USERLOGIN)]:
-===================================================================
-1. Khi vao Kiosk lan dau hoac sau khi dang xuat, man hinh se yeu cau Dang Nhap.
-2. Nguoi dung nhap:
-   - Ten dang nhap (UserName)
-   - Mat khau (Credential)
-3. He thong se tu dong kiem tra danh sach UserLogin tren SharePoint SEAZEN:
-   - Mat khau phai trung khop.
-   - Cot AdminRoles BAT BUOC phai co gia tri: "Xem lịch trực toàn bộ".
-   - Neu dung mat khau nhung thieu quyen "Xem lịch trực toàn bộ", he thong se tu choi truy cap.
-4. Dang nhap thanh cong se duoc luu phien lam viec (khong can dang nhap lai moi khi tai lai trang).
-5. Muon doi tai khoan hoac thoat: Nhap chuot vao nut "DANG XUAT" o goc tren ben phai.
+2. XAC THUC TAI KHOAN MICROSOFT 365 (BAT BUOC):
+- Khi chay lan dau, Kiosk hien thi man hinh yeu cau xac thuc tai khoan Microsoft.
+- Chon "DANG NHAP BANG MICROSOFT 365" de xac thuc tai khoan @seazen.com.vn.
+- Token duoc tu dong ma hoa bang Windows DPAPI va luu tru an tai:
+  %LOCALAPPDATA%\SeaZen_Canteen_Kiosk\token_cache.bin
+- He thong tu dong gia han token ngam, khong doi hoi dang nhap lai hang ngay.
 
-===================================================================
-[3. TRUY CAP TU XA QUA MANG NOI BO WI-FI / LAN (TRUONG HOP A)]:
-===================================================================
-Khi 1 may (may chu hoac may Kiosk) bat file SEAZEN_Canteen_Kiosk.exe:
-1. Tren man hinh console mau den se hien thi ro rang cac dia chi truy cap:
-   - Tren chinh may do:      http://localhost:5000
-   - Tu cac may khac (IP):   http://<IP_LAN_CUA_MAY>:5000   (Vi du: http://172.16.240.38:5000)
-   - Tu cac may khac (Ten):  http://<TEN_MAY_TINH>:5000    (Vi du: http://DESKTOP-PV2F9E7:5000)
-2. Cac may khac (Laptop, dien thoai, may tinh bang) chi can bat trinh duyet va go dia chi tren la dung duoc ngay.
-3. LUU Y VE TUONG LUA WINDOWS:
-   - Neu cac may khac khong vao duoc, hay nhap dup chuot vao file:
-     👉 MO_CONG_FIREWALL_LAN.bat (Chon Yes khi hoi quyen Administrator).
-   - Cong cu se tu dong mo cong 5000 tren Windows Firewall de cho phep cac may khac ket noi thong suot.
-
-===================================================================
-[4. HUONG DAN DOI TAI KHOAN / LAM MOI TOKEN (KHI CO SU CO TAI KHOAN)]:
-===================================================================
-File 'token_cache.bin' chua ma xac thuc ngam ket noi toi SharePoint Microsoft 365.
-Kiosk se tu dong lam moi token ngam nen ban khong can dang nhap lai hang ngay.
-
-KHI NAO BAN CAN THAY DOI TAI KHOAN / CAP NHAT LAI TOKEN?
-- Khi tai khoan ca nhan hien tai doi mat khau.
-- Khi nguoi phu trach cu chuyen cong tac / nghi viec hoac khong muon dung tai khoan ca nhan nua.
-- Khi muon chuyen quyen sang tai khoan chung cua Canteen hoac IT (Service Account).
-- Khi Kiosk bao loi: 'TOKEN_HET_HAN', 'TOKEN_RONG' hoac khong tai duoc danh sach don com.
-
-👉 CAC BUOC THUC HIEN DOI TAI KHOAN (CHI MAT 1 PHUT):
--------------------------------------------------------------------
-Cach 1: Su dung cong cu tu dong "DANG_NHAP_TAI_KHOAN_MOI.bat" (Khuyen dung)
-1. Tat Kiosk dang chay (neu co).
-2. Nhap dup chuot vao file: DANG_NHAP_TAI_KHOAN_MOI.bat
-3. Man hinh se hien ra mot doan ma xac nhan (Vi du: ABCD-EFGH) va tu dong mo trinh duyet vao trang:
-   https://microsoft.com/devicelogin
-4. Nhap ma hien thi tren man hinh -> Nhan "Tiep tuc" (Next).
-5. Dang nhap tai khoan Microsoft 365 moi cua cong ty SeaZen (Tai khoan bat ky co quyen truy cap vao SharePoint ONESEAZEN).
-6. Bam "Tiep tuc" / "Cho phep" de cap quyen.
-7. Cua so dong lenh se bao: "[+] XAC THUC THANH CONG!", va file 'token_cache.bin' moi duoc tu dong sinh ra va ghi de.
-8. Mo lai file "SEAZEN_Canteen_Kiosk.exe" de su dung binh thuong voi tai khoan moi!
-
-Cach 2: Neu may Kiosk khong cai Python (May doc lap cua nha an)
-1. Chay file "DANG_NHAP_TAI_KHOAN_MOI.bat" tren bat ky may tinh nao cua ban hoac IT co san Python.
-2. Thuc hien dang nhap theo cac buoc o Cach 1.
-3. Sau khi thanh cong, copy duy nhat file "token_cache.bin" vua tao ra va dan de vao thu muc Kiosk tren may nha an.
-
-===================================================================
-[5. KHUYEN NGHI DAI HAN VE TAI KHOAN CANTEEN]:
-- De he thong hoat dong on dinh lau dai ma khong phu thuoc vao ca nhan (tranh truong hop nhan vien doi mat khau hoac nghi viec lam gian doan Kiosk), de xuat IT cong ty tao mot tai khoan dich vu rieng:
-  Vi du: canteen.kiosk@seazen.com.vn hoac it.service@seazen.com.vn
-- Cap quyen thanh vien (Member / Edit) cho tai khoan nay vao SharePoint ONESEAZEN (danh sach Canteen_Orders).
-- Dang nhap tai khoan nay vao Kiosk mot lan duy nhat theo Huong dan o Muc 4.
-===================================================================
+3. QUY TAC NHAN DIEN MA NHAN VIEN:
+- Ho tro chuan hoa ma nhan vien dang so: loai bo cac so 0 o dau.
+- Dac quyen VIP Tong Giam Doc DO VAN TOAN:
+  Quet voi bat ky bien the nao: 1, 01, 001, 0001, 00001 deu nhan dien chinh xac
+  la 1 nguoi duy nhat: Tong Giam Doc DO VAN TOAN (Ma NV: 1).
+- Tu dong phat am thanh thong bao va duyet nhan com tuc thi.
+======================================================================
