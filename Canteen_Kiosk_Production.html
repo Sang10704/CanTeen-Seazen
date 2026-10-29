@@ -3531,30 +3531,30 @@
           }
 
           const ticketContent = isVIP ? `
-            <div class="meal-ticket-card ticket-success" style="border: 2px solid #EAB308; box-shadow: 0 12px 30px rgba(234, 179, 8, 0.3);">
-              <div class="ticket-top-bar" style="background: linear-gradient(135deg, #1B263B 0%, #2D3E5E 100%);">
-                <span class="ticket-status-pill success-pill" style="background: #FEF08A; color: #854D0E; font-weight: 800; border: 1px solid #EAB308;">
-                  ★ ĐÓN TIẾP TỔNG GIÁM ĐỐC ★
+            <div class="meal-ticket-card ticket-success">
+              <div class="ticket-top-bar">
+                <span class="ticket-status-pill success-pill">
+                  ✓ ĐÓN TIẾP TỔNG GIÁM ĐỐC
                 </span>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="ticket-time-badge" style="color: #FEF08A;">GIỜ: ${timeStr}</span>
+                  <span class="ticket-time-badge">GIỜ: ${timeStr}</span>
                   <button type="button" class="btn-ticket-close" onclick="closeScanPopup()">✕ ĐÓNG</button>
                 </div>
               </div>
 
-              <div class="ticket-emp-info" style="background: #FEFCE8; border: 1px solid #FEF08A;">
-                <div class="ticket-emp-id" style="color: #CA8A04;">MÃ NV: <strong>1</strong></div>
-                <div class="ticket-emp-name" style="font-size: 26px; font-weight: 900; color: #0F172A;">${escapeHtml(order.fullName || 'ĐỖ VĂN TOÀN')}</div>
-                <div class="ticket-emp-role" style="color: #B45309; font-weight: 700; font-size: 14px;">TỔNG GIÁM ĐỐC</div>
+              <div class="ticket-emp-info">
+                <div class="ticket-emp-id">MÃ NV: <strong>1</strong></div>
+                <div class="ticket-emp-name" style="font-size: 26px; font-weight: 800; color: #0F172A;">${escapeHtml(order.fullName || 'ĐỖ VĂN TOÀN')}</div>
+                <div class="ticket-emp-role" style="color: #16A34A; font-weight: 700; font-size: 14px;">TỔNG GIÁM ĐỐC</div>
                 ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
               </div>
 
               ${qtyWarnHtml}
 
-              <div class="ticket-footer-msg" style="background: #1B263B; color: #FEF08A; font-weight: 800; font-size: 13.5px; letter-spacing: 0.5px;">
+              <div class="ticket-footer-msg">
                 KÍNH MỜI TỔNG GIÁM ĐỐC NHẬN CƠM • CHÚC ANH NGON MIỆNG!
               </div>
-              <div class="ticket-progress-bar" style="background: #EAB308;"></div>
+              <div class="ticket-progress-bar"></div>
             </div>
           ` : `
             <div class="meal-ticket-card ticket-success">
