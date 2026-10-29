@@ -116,6 +116,54 @@ class KioskComprehensiveTests(unittest.TestCase):
             res2 = self.post('1')
             self.assertEqual(res2.json['status'], 'ALREADY_CLAIMED')
 
+    def test_tgd_offline_resilient_fallback(self):
+        """Khi máy chủ gián đoạn, Tổng Giám Đốc quét mã 01 vẫn được duyệt thành công ngay tại Kiosk"""
+        with mock.patch.object(kiosk, 'get_access_token', return_value='fake_token'), \
+             mock.patch.object(kiosk, 'save_checkin_to_sharepoint', return_value=(None, 'Không thể kết nối đến máy chủ')):
+            response = self.post('01')
+            self.assertEqual(response.status_code, 200)
+            data = response.json
+            self.assertEqual(data['status'], 'SUCCESS')
+            self.assertEqual(data['order']['empId'], '1')
+            self.assertEqual(data['order']['fullName'], 'ĐỖ VĂN TOÀN')
+            self.assertFalse(data['spSynced'])
+
+    def test_save_checkin_vip_payload_schema(self):
+        """Kiểm tra payload gửi lên Graph API chỉ chứa các cột hợp lệ, không chứa ChucVu/LoaiMon/SoLuongSuat gây lỗi HTTP 400"""
+        mock_get = mock.MagicMock()
+        mock_get.status_code = 200
+        mock_get.json.return_value = {'value': []}
+
+        mock_post = mock.MagicMock()
+        mock_post.status_code = 201
+        mock_post.json.return_value = {'id': 'created_item_123'}
+
+        with mock.patch.object(kiosk, 'get_access_token', return_value='fake_token'), \
+             mock.patch.object(kiosk.requests, 'get', return_value=mock_get), \
+             mock.patch.object(kiosk.requests, 'post', return_value=mock_post) as mock_post:
+            item_id, err = kiosk.save_checkin_to_sharepoint(None, '12:00:00', '2026-09-30', vip=True)
+            self.assertEqual(item_id, 'created_item_123')
+            self.assertIsNone(err)
+
+            # Kiểm tra fields trong payload
+            self.assertIsNotNone(mock_post.call_args)
+            called_json = mock_post.call_args[1].get('json', {})
+            fields = called_json.get('fields', {})
+            self.assertEqual(fields.get('Title'), '1')
+            self.assertEqual(fields.get('HoTen'), 'ĐỖ VĂN TOÀN')
+            self.assertEqual(fields.get('TrangThai'), 'Đã nhận cơm')
+            # Đảm bảo 3 trường gây lỗi 400 không có mặt trong payload
+            self.assertNotIn('ChucVu', fields)
+            self.assertNotIn('LoaiMon', fields)
+            self.assertNotIn('SoLuongSuat', fields)
+
+    def test_no_system_keywords_in_user_facing_messages(self):
+        """Đảm bảo các thông báo trả về cho người dùng không chứa từ 'SharePoint' hoặc mã lỗi HTTP"""
+        with mock.patch.object(kiosk, 'get_access_token', return_value=None):
+            _, err = kiosk.save_checkin_to_sharepoint('1', '12:00:00', '2026-09-30')
+            self.assertNotIn('sharepoint', err.lower())
+            self.assertNotIn('http', err.lower())
+
     # =========================================================================
     # 3. KIỂM THỬ ÉP BUỘC ĐĂNG NHẬP MICROSOFT 365
     # =========================================================================

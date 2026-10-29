@@ -333,8 +333,8 @@ def clear_token_cache():
 # =============================================================================
 def normalize_emp_id(raw_val):
     """
-    Chuẩn hóa mã nhân viên loại bỏ các số 0 ở đầu nếu là chuỗi số:
-    Ví dụ: '1', '01', '001', '0001', '00001', '000001' đều quy về '1'.
+    Chuẩn hóa mã nhân viên: cắt bỏ toàn bộ các số 0 ở phía trước cho đến khi gặp chữ số khác 0:
+    Ví dụ: '1', '01', '001', '0001', '00001' đều quy về '1'.
     Hỗ trợ cả chuỗi mã vạch / QR mở rộng dạng '00001|Đỗ Văn Toàn|Tổng Giám Đốc'.
     """
     if raw_val is None:
@@ -342,9 +342,11 @@ def normalize_emp_id(raw_val):
     s = str(raw_val).strip()
     if '|' in s:
         s = s.split('|', 1)[0].strip()
-    if s.isdigit():
-        return str(int(s))
-    return s
+    # Cắt bớt các số 0 phía trước, gặp số khác 0 thì dừng lại
+    trimmed = s.lstrip('0')
+    if not trimmed and s:
+        return '0'
+    return trimmed if trimmed else s
 
 
 def get_lan_ip():
@@ -516,10 +518,10 @@ def fetch_sharepoint_data(force=False):
 
 
 def save_checkin_to_sharepoint(item_id, claimed_at, meal_date, vip=False):
-    """Ghi nhận trên SharePoint trước khi báo check-in thành công."""
+    """Ghi nhận vào máy chủ dữ liệu trước khi báo check-in thành công."""
     token = get_access_token()
     if not token:
-        return None, 'Không thể xác thực SharePoint. Yêu cầu đăng nhập tài khoản Microsoft 365.'
+        return None, 'Phiên làm việc hết hạn. Vui lòng đăng nhập lại tài khoản Microsoft 365.'
 
     headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
     base_url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{LIST_NAME}/items"
@@ -530,7 +532,7 @@ def save_checkin_to_sharepoint(item_id, claimed_at, meal_date, vip=False):
             while url:
                 lookup = requests.get(url, headers=headers, timeout=10)
                 if lookup.status_code != 200:
-                    return None, f'Không kiểm tra được đơn trên SharePoint (HTTP {lookup.status_code}).'
+                    return None, 'Không thể kiểm tra dữ liệu đơn ăn trên máy chủ.'
                 data = lookup.json()
                 for item in data.get('value', []):
                     fields = item.get('fields', {})
@@ -550,21 +552,28 @@ def save_checkin_to_sharepoint(item_id, claimed_at, meal_date, vip=False):
             if response.status_code in (200, 204):
                 return item_id, None
         elif vip:
-            # Tự động tạo suất ăn danh dự cho Tổng Giám Đốc nếu chưa đăng ký trước
-            response = requests.post(base_url, headers=headers, json={'fields': {
-                'Title': '1', 'HoTen': 'ĐỖ VĂN TOÀN', 'ChucVu': 'Tổng Giám Đốc', 'TrangThai': 'Đã nhận cơm',
-                'NgayAn': f'{meal_date}T00:00:00Z', 'GioNhan': claimed_at,
-                'LoaiMon': 'Món mặn', 'SoLuongSuat': 1,
-                'GhiChu': 'Suất ăn Tổng Giám Đốc (Quét trực tiếp tại Kiosk)'
-            }}, timeout=8)
+            # Tự động tạo suất ăn danh dự cho Tổng Giám Đốc Đỗ Văn Toàn
+            # SCHEMA CHUẨN: Danh sách chỉ bao gồm Title, HoTen, TrangThai, NgayAn, GioNhan, GhiChu.
+            # Tuyệt đối không gửi ChucVu, LoaiMon, SoLuongSuat để tránh lỗi máy chủ HTTP 400.
+            payload = {
+                'fields': {
+                    'Title': '1',
+                    'HoTen': 'ĐỖ VĂN TOÀN',
+                    'TrangThai': 'Đã nhận cơm',
+                    'NgayAn': f'{meal_date}T00:00:00Z',
+                    'GioNhan': claimed_at,
+                    'GhiChu': 'Suất ăn Tổng Giám Đốc (Quét trực tiếp tại Kiosk)'
+                }
+            }
+            response = requests.post(base_url, headers=headers, json=payload, timeout=8)
             if response.status_code in (200, 201):
                 return response.json().get('id'), None
         else:
-            return None, 'Đơn ăn thiếu mã SharePoint. Vui lòng làm mới danh sách.'
-        return None, f'Ghi nhận trên SharePoint thất bại (HTTP {response.status_code}).'
+            return None, 'Dữ liệu suất ăn chưa được đồng bộ đầy đủ. Vui lòng làm mới danh sách.'
+        return None, 'Không thể cập nhật trạng thái vào máy chủ. Vui lòng thử lại.'
     except requests.RequestException as exc:
-        print(f'[-] Lỗi đồng bộ SharePoint: {exc}')
-        return None, 'Không kết nối được SharePoint. Vui lòng thử lại.'
+        print(f'[-] Lỗi kết nối máy chủ dữ liệu: {exc}')
+        return None, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra đường truyền mạng.'
 
 
 # =============================================================================
@@ -654,13 +663,30 @@ def _checkin_locked():
         item_id, sync_error = save_checkin_to_sharepoint(
             matched_order.get('itemId') if matched_order else None, gio_nhan, today_vn, vip=True
         )
+
+        # Cơ chế Resilient Check-in cho Tổng Giám Đốc:
+        # Nếu mạng máy chủ gián đoạn, Kiosk KHÔNG BAO GIỜ chặn bằng popup lỗi màu đỏ.
+        # Luôn luôn duyệt suất ăn cho Tổng Giám Đốc ngay lập tức và retry đồng bộ ngầm.
         if sync_error:
-            return jsonify({'status': 'SYNC_ERROR', 'message': sync_error, 'spSynced': False}), 503
+            print(f"[!] [VIP Check-in] Máy chủ gián đoạn ({sync_error}), tự động kích hoạt luồng đồng bộ ngầm cho Tổng Giám Đốc.")
+            def _async_retry_tgd_sync():
+                for retry_i in range(1, 6):
+                    time.sleep(3 * retry_i)
+                    try:
+                        rid, err = save_checkin_to_sharepoint(None, gio_nhan, today_vn, vip=True)
+                        if rid and not err:
+                            print(f"[+] [VIP Sync Background] Đồng bộ thành công đơn của Tổng Giám Đốc sau lần thử {retry_i} (ID: {rid})")
+                            break
+                    except Exception as ex:
+                        print(f"[-] [VIP Sync Background] Lần thử {retry_i} gặp lỗi: {ex}")
+            threading.Thread(target=_async_retry_tgd_sync, daemon=True).start()
 
         if matched_order:
-            matched_order['itemId'] = item_id
+            matched_order['itemId'] = item_id or matched_order.get('itemId')
             matched_order['status'] = 'Đã nhận cơm'
             matched_order['claimedAt'] = gio_nhan
+            matched_order['empId'] = '1'
+            matched_order['normEmpId'] = '1'
             final_order = matched_order
         else:
             final_order = {
@@ -679,7 +705,8 @@ def _checkin_locked():
             }
 
         orders_today["1"] = final_order
-        CACHED_ALL_TODAY_LIST.append(final_order)
+        if final_order not in CACHED_ALL_TODAY_LIST:
+            CACHED_ALL_TODAY_LIST.append(final_order)
 
         # Cập nhật cache cục bộ
         LOCAL_CHECKIN_OVERLAY["1"] = {'date': today_vn, 'status': 'Đã nhận cơm', 'claimedAt': gio_nhan}
@@ -701,7 +728,7 @@ def _checkin_locked():
             'status': 'SUCCESS',
             'message': 'Kính mời Tổng Giám Đốc nhận cơm, chúc anh ngon miệng!',
             'order': final_order,
-            'spSynced': True
+            'spSynced': (sync_error is None)
         })
 
     # =========================================================================

@@ -2375,7 +2375,7 @@
           </div>
 
           <button type="button" class="btn-action-pill" onclick="refreshTodayOrders(true)"
-            title="Đồng bộ lại tức thì từ SharePoint">
+            title="Làm mới dữ liệu từ máy chủ">
             <svg style="width: 13px; height: 13px; fill: currentColor;" viewBox="0 0 24 24">
               <path
                 d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
@@ -2633,12 +2633,12 @@
           </div>
           <div class="modal-actions-group">
             <button type="button" class="btn-voice-preview" onclick="refreshTodayOrders(true)"
-              title="Đồng bộ lại từ SharePoint">
+              title="Làm mới dữ liệu từ máy chủ">
               <svg style="width: 13px; height: 13px; fill: currentColor;" viewBox="0 0 24 24">
                 <path
                   d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
               </svg>
-              <span>LÀM MỚI TỪ SP</span>
+              <span>LÀM MỚI</span>
             </button>
             <button type="button" class="btn-modal-action btn-modal-excel" onclick="exportModalToExcel()"
               title="Tải về file Excel (CSV UTF-8 chuẩn tiếng Việt)">
@@ -3204,10 +3204,12 @@
       if (s.includes('|')) {
         s = s.split('|')[0].trim();
       }
-      if (/^\d+$/.test(s)) {
-        return String(parseInt(s, 10));
+      // Cắt bớt các số 0 phía trước, gặp chữ số khác 0 thì dừng lại
+      const trimmed = s.replace(/^0+/, '');
+      if (trimmed === '' && s.length > 0) {
+        return '0';
       }
-      return s;
+      return trimmed || s;
     }
 
     // Chuẩn hóa mã nhân viên từ quét thẻ: chấp nhận chuỗi số từ 1 đến 10 chữ số (1, 01, 001, 0001, 00001, v.v.)
@@ -3477,6 +3479,7 @@
       const parsed = parseBadgeScanString(cleanRaw);
       const empId = parsed.empId;
       const normEmpId = normalizeEmpId(empId);
+      const displayEmpId = (normEmpId === '1') ? '1' : (normEmpId || empId);
 
       // 3. KIỂM TRA ĐỘ NHẠY / GIÃN CÁCH GIỮA 2 LẦN TRÙNG MÃ (COOLDOWN CHO CẢ MÃ GỐC VÀ MÃ CHUẨN HÓA):
       if (isScanInCooldown(cleanRaw) || (empId && isScanInCooldown(empId)) || (normEmpId && isScanInCooldown(normEmpId))) {
@@ -3599,7 +3602,7 @@
               ${order.note ? `<div class="ticket-emp-note">📝 <strong>Ghi chú:</strong> ${escapeHtml(order.note)}</div>` : ''}
             </div>` : `
             <div class="ticket-emp-info">
-              <div class="ticket-emp-id" style="color: #EA580C;">MÃ NV: <strong>${empId}</strong></div>
+              <div class="ticket-emp-id" style="color: #EA580C;">MÃ NV: <strong>${displayEmpId}</strong></div>
             </div>`;
 
           openScanPopup(`
@@ -3669,9 +3672,9 @@
           openScanPopup(`
             <div class="meal-ticket-card ticket-error">
               <div class="ticket-top-bar"><span class="ticket-status-pill error-pill">✕ CHƯA GHI NHẬN</span></div>
-              <div class="ticket-emp-info"><div class="ticket-emp-id">MÃ NV: <strong>${escapeHtml(empId)}</strong></div></div>
-              <div class="ticket-alert-box error-alert"><strong>Không đồng bộ được SharePoint</strong>
-                <p>${escapeHtml(result.message || 'Vui lòng thử lại hoặc liên hệ quản lý bếp.')}</p></div>
+              <div class="ticket-emp-info"><div class="ticket-emp-id">MÃ NV: <strong>${escapeHtml(displayEmpId)}</strong></div></div>
+              <div class="ticket-alert-box error-alert"><strong>Chưa thể ghi nhận vào máy chủ</strong>
+                <p>${escapeHtml(result.message || 'Vui lòng quét lại thẻ hoặc liên hệ quản lý bếp.')}</p></div>
             </div>
           `, 6000);
           playKioskFeedback('NOT_REGISTERED');
@@ -3688,7 +3691,7 @@
               </div>
 
               <div class="ticket-emp-info">
-                <div class="ticket-emp-id" style="color: #DC2626;">MÃ NV: <strong>${empId}</strong></div>
+                <div class="ticket-emp-id" style="color: #DC2626;">MÃ NV: <strong>${displayEmpId}</strong></div>
                 <div class="ticket-emp-name">${parsed.rawName || 'Chưa xác định'}</div>
               </div>
 
