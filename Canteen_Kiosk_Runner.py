@@ -970,7 +970,7 @@ def serve_mp3(filename):
     for target_dir in [MP3_DIR, os.path.join(BUNDLE_DIR, 'mp3'), os.path.join(EXE_DIR, 'mp3')]:
         p = os.path.join(target_dir, filename)
         if os.path.exists(p):
-            return send_file(p)
+            return send_file(p, mimetype='audio/mpeg')
     return jsonify({'error': 'Audio not found'}), 404
 
 
